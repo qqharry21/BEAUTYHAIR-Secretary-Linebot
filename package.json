@@ -1,0 +1,13 @@
+{
+  "name": "BEAUTYHAIR-Secretary-Linebot",
+  "version": "0.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node ."
+  },
+  "dependencies": {
+    "@line/bot-sdk": "^7.4.0",
+    "express": "^4.17.1"
+  }
+}
