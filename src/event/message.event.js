@@ -15,8 +15,8 @@ const CANCEL_SERVICE = require('../service/cancel.service');
 
 // * CONTROLLER
 const bookController = require('../controller/book.controller');
-const countController = require('../controller/count.controller');
-const showController = require('../controller/show.controller');
+// const countController = require('../controller/count.controller');
+// const showController = require('../controller/show.controller');
 const searchController = require('../controller/search.controller');
 const modifyController = require('../controller/modify.controller');
 const cancelController = require('../controller/cancel.controller');
@@ -27,21 +27,19 @@ const PROCESS_MANAGER = require('../function/processManager');
 /** 處理文字 */
 function handleText(message, replyToken, source, process) {
   const text = message.text;
-  const order = bookController.getOrder();
-  console.log('order from text', order);
-  // # getStatus()
-
-  // const cancelStatus = cancelController.getStatus();
   // ? 若狀態不為空，則判斷為哪個PROCESS
   if (process != '') {
     switch (process) {
       case 'BOOK':
         // ? 是否為名字輸入狀態
-        if (bookController.getStatus()) {
+        if (bookController.getStatus() || bookController.getSubjectStatus()) {
           // ? 是否符合名字格式
           if (text.match('^b/[\u4e00-\u9fa5a-zA-Z]+$')) {
             console.log('match book');
-            return bookController.handleName(replyToken, text, status, false);
+            return bookController.handleName(replyToken, text);
+          } else if (['修剪新品', '洗/染', '剪髮', '返修', '其他'].some(item => item == text)) {
+            bookController.setSubjectStatus(false);
+            return bookController.confirmOrder(replyToken, text);
           } else {
             return handleErrorInput(replyToken);
           }
@@ -54,7 +52,8 @@ function handleText(message, replyToken, source, process) {
         break;
       case 'SEARCH':
         // ? 是否為名字輸入狀態
-        if (searchController.getStatus()) {
+        const status = searchController.getStatus();
+        if (status) {
           // ? 是否符合名字格式
           if (text.match('^s/[\u4e00-\u9fa5a-zA-Z]+$')) {
             console.log('match search');
@@ -68,13 +67,20 @@ function handleText(message, replyToken, source, process) {
         }
       case 'MODIFY':
         // ? 是否為名字輸入狀態
-        if (modifyController.getStatus()) {
+        if (
+          modifyController.getStatus()
+          // || modifyController.getSubjectStatus()
+        ) {
           // ? 是否符合名字格式
           if (text.match('^m/[\u4e00-\u9fa5a-zA-Z]+$')) {
             console.log('match modify');
-            // return modifyController.handleName(replyToken, text, status, false);
-            break;
-          } else {
+            return modifyController.handleName(replyToken, text);
+          }
+          // else if (['修剪新品', '洗/染', '剪髮', '返修', '其他'].some(item => item == text)) {
+          //   modifyController.setSubjectStatus(false);
+          //   return modifyController.confirmOrder(replyToken, text);
+          // }
+          else {
             return handleErrorInput(replyToken);
           }
         } else {
@@ -240,96 +246,20 @@ function handleText(message, replyToken, source, process) {
             },
           },
         });
-      case '服務內容':
-        return client.replyMessage(replyToken, {
-          type: 'flex',
-          altText: 'this is a flex message',
-          contents: {
-            type: 'text',
-            text: '請選擇服務項目',
-            quickReply: {
-              items: [
-                {
-                  type: 'action',
-                  imageUrl: 'https://img.icons8.com/office/50/000000/new.png',
-                  action: {
-                    label: '修剪新品',
-                    type: 'postback',
-                    text: '修剪新品',
-                  },
-                },
-                {
-                  type: 'action',
-                  imageUrl: 'https://img.icons8.com/offices/50/000000/hair-washing-sink.png',
-                  action: {
-                    label: '洗/染',
-                    type: 'postback',
-                    text: '洗/染',
-                  },
-                },
-                {
-                  type: 'action',
-                  imageUrl: 'https://img.icons8.com/color/48/000000/hairdresser.png',
-                  action: {
-                    label: '剪髮',
-                    type: 'postback',
-                    text: '剪髮',
-                  },
-                },
-                {
-                  type: 'action',
-                  imageUrl: 'https://img.icons8.com/offices/50/000000/barber-chair.png',
-                  action: {
-                    label: '返修',
-                    type: 'postback',
-                    text: '返修',
-                  },
-                },
-                {
-                  type: 'action',
-                  imageUrl:
-                    'https://img.icons8.com/external-those-icons-lineal-color-those-icons/24/000000/external-barber-barber-shop-those-icons-lineal-color-those-icons.png',
-                  action: {
-                    label: '其他',
-                    type: 'postback',
-                    text: '其他',
-                  },
-                },
-                {
-                  type: 'action',
-                  action: {
-                    type: 'location',
-                    label: 'Send location',
-                  },
-                },
-              ],
-            },
-          },
-        });
+
       default:
         console.log(`Echo message to ${replyToken}: ${text}`);
-        // let status = bookController.getStatus();
-        // if (status) {
-        //   /* setStatus(false) 寫入resetOrder() */
-        //   // bookController.setStatus(false);
-        //   bookController.resetOrder();
-        //   return handleErrorInput(true, replyToken);
-        // } else if (cancelStatus) {
-        //   cancelController.resetCancelOrder();
-        //   return handleErrorInput(false, replyToken);
-        // } else {
-        const echo = {
+        return client.replyMessage(replyToken, {
           type: 'text',
-          text: text,
-        };
-        return client.replyMessage(replyToken, echo);
-      // }
+          text: '無效指令',
+        });
     }
   }
 }
 
 // * Error Input
 function handleErrorInput(replyToken) {
+  PROCESS_MANAGER.resetProcess();
   return client.replyMessage(replyToken, {
     type: 'text',
     text: '格式錯誤，請重新點選功能',

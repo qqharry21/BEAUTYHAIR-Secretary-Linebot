@@ -67,7 +67,7 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
 /** 處理 all event */
 function handleEvent(event) {
-  console.log('event', event);
+  // console.log('event', event);
   // if (event.type !== 'message' || event.message.type !== 'text') {
   //   // ignore non-text-message event
   //   return Promise.resolve(null);
@@ -82,20 +82,6 @@ function handleEvent(event) {
       switch (message.type) {
         case 'text':
           return MESSAGE_EVENT.handleText(message, replyToken, event.source, process);
-        // const status = bookController.getStatus();
-        // if (status && message.text.match('^b/[\u4e00-\u9fa5a-zA-Z]+$')) {
-        //   console.log('match');
-        //   // ? 狀況=>流程中，輸入b/(正確格式)=>SUCCESS
-        //   return bookController.handleName(replyToken, message.text, status, false);
-        // } else if (!status && message.text.match('^b/[\u4e00-\u9fa5a-zA-Z]+$')) {
-        //   console.log('error input timing');
-        //   // ? 狀況=>非流程中，輸入b/XX(正確格式，錯誤時間)=>ERROR
-        //   return bookController.handleName(replyToken, message.text, status, true);
-        // } else if (status && !message.text.match('^b/[\u4e00-\u9fa5a-zA-Z]+$')) {
-        //   return MESSAGE_EVENT.handleText(message, replyToken, event.source);
-        // } else {
-        //   return MESSAGE_EVENT.handleText(message, replyToken, event.source);
-        // }
         case 'image':
           return MESSAGE_EVENT.handleImage(message, replyToken);
         case 'video':
@@ -122,6 +108,7 @@ function handleEvent(event) {
     // * postback event
     case 'postback':
       const postback = event.postback;
+      return POSTBACK_SERVICE.execute(replyToken, postback, process);
       switch (postback.data) {
         case 'book':
           return POSTBACK_SERVICE.book(replyToken);
@@ -130,12 +117,11 @@ function handleEvent(event) {
         case 'cancel':
           return POSTBACK_SERVICE.cancel(replyToken);
         case 'confirmName':
-          console.log('confirm name order', bookController.getOrder());
           return bookController.handleDate(replyToken, true, postback);
         case 'successDate':
           console.log('confirm date order', bookController.getOrder());
           return bookController.handleTime(replyToken, true, postback);
-        case 'modify':
+        case 'modifyName':
           return POSTBACK_SERVICE.modify(replyToken);
         case 'modifyName':
           return POSTBACK_SERVICE.modifyName(replyToken);

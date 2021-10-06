@@ -1,4 +1,5 @@
 /** @format */
+const axios = require('axios');
 
 /** 輸入名字狀態 - modify */
 let status = false;
@@ -6,12 +7,41 @@ let status = false;
 /** 更改客戶姓名 */
 let modifyName = '';
 
-/** 原預約資料 */
-let selectName = '';
-let selectDate = '';
-let selectTime = '';
-let selectEndTime = '';
-let selectSubject = '';
+/** 所有相關 */
+let modifyList = [];
+
+/** 欲更改的預約資料 */
+let data = {
+  selectName: '',
+  selectDate: '',
+  selectTime: '',
+  selectEndTime: '',
+  selectSubject: '',
+};
+
+/** 確認-更改預約 */
+function modify(replyToken) {
+  setStatus(true);
+  return client.replyMessage(replyToken, {
+    type: 'text',
+    text: '請輸入欲更改預約的客戶姓名(格式為m/xx)',
+  });
+}
+
+/** 取消-更改預約 */
+function cancelModify(replyToken) {
+  // 結束流程
+  PROCESS_MANAGER.resetProcess();
+  resetOrder();
+  return client.replyMessage(replyToken, {
+    type: 'text',
+    text: '取消更改預約流程',
+  });
+}
+
+function handleName(replyToken, text) {
+
+}
 
 /** 設置名字輸入狀態 */
 function setStatus(process) {
@@ -24,30 +54,31 @@ function getStatus() {
 }
 
 /** 設置查詢名字 */
-function setmodifyName(name) {
+function setModifyName(name) {
   modifyName = name;
 }
 
 /** 抓取查詢名字 */
-function getmodifyName() {
+function getModifyName() {
   return modifyName;
 }
 
-/** 設置查找範圍 */
-function setmodifyRange(range) {
-  modifyRange = range;
+/** 向資料庫抓取所有相關預約 */
+async function getModifyList() {
+  const res = await axios.get('');
 }
 
-/** 抓取查找範圍 */
-function getmodifyRange() {
-  return modifyRange;
-}
+/** 選擇該欲更改的預約 */
+// function handleSelect() {}
 
 module.exports = {
+  handleName,
+  modify,
+  cancelModify,
   setStatus,
   getStatus,
-  setmodifyName,
-  getmodifyName,
-  setmodifyRange,
-  getmodifyRange,
+  setModifyName,
+  getModifyName,
+  getModifyList,
+  // handleSelect,
 };

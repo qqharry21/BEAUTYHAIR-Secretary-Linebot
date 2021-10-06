@@ -5,23 +5,29 @@ let status = '';
 /** 設定流程狀態 */
 function setProcess(process) {
   switch (process) {
-    case book:
+    case 'book':
       status = 'BOOK';
       break;
-    case count:
+    case 'count':
       status = 'COUNT';
       break;
-    case show:
+    case 'show':
       status = 'SHOW';
       break;
-    case search:
+    case 'search':
       status = 'SEARCH';
       break;
-    case modify:
+    case 'modify':
       status = 'MODIFY';
       break;
-    case cancel:
+    case 'cancel':
       status = 'CANCEL';
+      break;
+    case 'send':
+      status = 'SENDING';
+      break;
+    case 'fetch':
+      status = 'FETCHING';
       break;
   }
 }
