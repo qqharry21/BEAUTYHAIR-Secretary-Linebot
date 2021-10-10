@@ -1,0 +1,61 @@
+ {
+      type: 'text',
+      text: '請選擇服務項目',
+      quickReply: {
+        items: [
+          {
+            type: 'action',
+            imageUrl: 'https://img.icons8.com/office/50/000000/new.png',
+            action: {
+              label: '修剪新品',
+              type: 'text',
+              text: '修剪新品',
+            },
+          },
+          {
+            type: 'action',
+            imageUrl: 'https://img.icons8.com/offices/50/000000/hair-washing-sink.png',
+            action: {
+              label: '洗/染',
+              type: 'text',
+              text: '洗/染',
+            },
+          },
+          {
+            type: 'action',
+            imageUrl: 'https://img.icons8.com/color/48/000000/hairdresser.png',
+            action: {
+              label: '剪髮',
+              type: 'text',
+              text: '剪髮',
+            },
+          },
+          {
+            type: 'action',
+            imageUrl: 'https://img.icons8.com/offices/50/000000/barber-chair.png',
+            action: {
+              label: '返修',
+              type: 'text',
+              text: '返修',
+            },
+          },
+          {
+            type: 'action',
+            imageUrl:
+              'https://img.icons8.com/external-those-icons-lineal-color-those-icons/24/000000/external-barber-barber-shop-those-icons-lineal-color-those-icons.png',
+            action: {
+              label: '其他',
+              type: 'postback',
+              text: '其他',
+            },
+          },
+          {
+            type: 'action',
+            action: {
+              type: 'location',
+              label: 'Send location',
+            },
+          },
+        ],
+      },
+    }

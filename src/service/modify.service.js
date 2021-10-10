@@ -7,9 +7,11 @@ const client = new line.Client({
 });
 const PROCESS_MANAGER = require('../function/processManager');
 const modifyController = require('../controller/modify.controller');
+
+/** Modify init */
 function execute(replyToken) {
   PROCESS_MANAGER.setProcess('modify');
-  // bookController.setOrder('', '', '', '', '');
+  modifyController.resetNewOrder();
   return client.replyMessage(replyToken, {
     type: 'template',
     altText: '更改預約選單',
@@ -31,4 +33,5 @@ function execute(replyToken) {
     },
   });
 }
+
 module.exports = { execute };

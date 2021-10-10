@@ -1,5 +1,6 @@
 /** @format */
 
+/** 流程狀態 */
 let status = '';
 
 /** 設定流程狀態 */
@@ -31,10 +32,12 @@ function setProcess(process) {
       break;
   }
 }
+
 /** 抓取流程狀態 */
 function getProcess() {
   return status;
 }
+
 /** 取消流程狀態 */
 function resetProcess() {
   status = '';

@@ -1,0 +1,154 @@
+{
+  "type": "bubble",
+  "body": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "text",
+        "text": "陳泉豪",
+        "weight": "bold",
+        "size": "xxl",
+        "color": "#87e8de"
+      },
+      {
+        "type": "box",
+        "layout": "vertical",
+        "margin": "lg",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "baseline",
+            "spacing": "sm",
+            "contents": [
+              {
+                "type": "text",
+                "text": "日期 / 時間",
+                "color": "#333333",
+                "size": "sm",
+                "flex": 2,
+                "weight": "bold"
+              },
+              {
+                "type": "text",
+                "text": "2021-10-16 / 下午 08:50",
+                "wrap": true,
+                "size": "md",
+                "flex": 5,
+                "align": "end",
+                "color": "#111111",
+                "weight": "bold"
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "spacing": "sm",
+            "contents": [
+              {
+                "type": "text",
+                "text": "服務時程 / 項目",
+                "color": "#333333",
+                "size": "sm",
+                "flex": 2,
+                "weight": "bold"
+              },
+              {
+                "type": "text",
+                "text": "120分鐘 / 修剪新品",
+                "wrap": true,
+                "color": "#111111",
+                "size": "md",
+                "flex": 3,
+                "align": "end",
+                "weight": "bold"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "text": "請選擇欲更改內容",
+        "align": "center",
+        "size": "sm",
+        "offsetTop": "6px",
+        "color": "#aaaaaa"
+      },
+      {
+        "type": "separator",
+        "margin": "xl"
+      }
+    ]
+  },
+  "footer": {
+    "type": "box",
+    "layout": "vertical",
+    "spacing": "sm",
+    "contents": [
+      {
+        "type": "button",
+        "style": "primary",
+        "height": "sm",
+        "action": {
+          "type": "postback",
+          "label": "客戶姓名",
+          "data": "modifyName",
+          "displayText": "更改客戶姓名"
+        },
+        "color": "#87e8de"
+      },
+      {
+        "type": "button",
+        "style": "primary",
+        "height": "sm",
+        "action": {
+          "type": "postback",
+          "label": "預約日期",
+          "data": "modifyDate",
+          "displayText": "更改預約日期"
+        },
+        "color": "#87e8de"
+      },
+      {
+        "type": "button",
+        "style": "primary",
+        "height": "sm",
+        "action": {
+          "type": "postback",
+          "label": "預約時間",
+          "data": "modifyTime",
+          "displayText": "更改預約時間"
+        },
+        "color": "#87e8de"
+      },
+      {
+        "type": "button",
+        "style": "primary",
+        "height": "sm",
+        "action": {
+          "type": "postback",
+          "label": "服務時程",
+          "data": "modifyEndTime",
+          "displayText": "更改服務時程"
+        },
+        "color": "#87e8de"
+      },
+      {
+        "type": "button",
+        "style": "primary",
+        "height": "sm",
+        "action": {
+          "type": "postback",
+          "label": "服務項目",
+          "data": "modifySubject",
+          "displayText": "更改服務項目"
+        },
+        "color": "#87e8de"
+      }
+    ],
+    "flex": 0
+  }
+}

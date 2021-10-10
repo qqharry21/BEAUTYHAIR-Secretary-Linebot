@@ -1,29 +1,29 @@
 /** @format */
 
+//* IMPORT
 const line = require('@line/bot-sdk');
 const client = new line.Client({
   channelAccessToken: process.env['CHANNEL_ACCESS_TOKEN'],
   channelSecret: process.env['CHANNEL_SECRET'],
 });
-// * SERVICE
+//* SERVICE
 const BOOK_SERVICE = require('../service/book.service');
 const COUNT_SERVICE = require('../service/count.service');
 const SHOW_SERVICE = require('../service/show.service');
 const SEARCH_SERVICE = require('../service/search.service');
 const MODIFY_SERVICE = require('../service/modify.service');
 const CANCEL_SERVICE = require('../service/cancel.service');
-
-// * CONTROLLER
+//* CONTROLLER
 const bookController = require('../controller/book.controller');
 // const countController = require('../controller/count.controller');
 // const showController = require('../controller/show.controller');
 const searchController = require('../controller/search.controller');
 const modifyController = require('../controller/modify.controller');
 const cancelController = require('../controller/cancel.controller');
-
-// * PROCESS
+//* PROCESS
 const PROCESS_MANAGER = require('../function/processManager');
 
+//* FUNCTION
 /** 處理文字 */
 function handleText(message, replyToken, source, process) {
   const text = message.text;
@@ -32,18 +32,21 @@ function handleText(message, replyToken, source, process) {
     switch (process) {
       case 'BOOK':
         // ? 是否為名字輸入狀態
-        if (bookController.getStatus() || bookController.getSubjectStatus()) {
+        if (bookController.getStatus() || bookController.getSubjectStatus_Book()) {
           // ? 是否符合名字格式
           if (text.match('^b/[\u4e00-\u9fa5a-zA-Z]+$')) {
             console.log('match book');
-            return bookController.handleName(replyToken, text);
+            return bookController.handleName(replyToken, text.split('b/').pop());
           } else if (['修剪新品', '洗/染', '剪髮', '返修', '其他'].some(item => item == text)) {
-            bookController.setSubjectStatus(false);
-            return bookController.confirmOrder(replyToken, text);
+            bookController.setSubjectStatus_Book(false);
+            bookController.setSubject(text);
+            return bookController.confirmBook(replyToken);
           } else {
+            bookController.resetOrder();
             return handleErrorInput(replyToken);
           }
         } else {
+          bookController.resetOrder();
           return handleErrorInput(replyToken);
         }
       case 'COUNT':
@@ -52,38 +55,45 @@ function handleText(message, replyToken, source, process) {
         break;
       case 'SEARCH':
         // ? 是否為名字輸入狀態
-        const status = searchController.getStatus();
-        if (status) {
+        if (searchController.getStatus()) {
           // ? 是否符合名字格式
           if (text.match('^s/[\u4e00-\u9fa5a-zA-Z]+$')) {
             console.log('match search');
             // return searchController.handleName(replyToken, text, status, false);
             break;
           } else {
+            modifyController.resetNewOrder();
             return handleErrorInput(replyToken);
           }
         } else {
+          modifyController.resetNewOrder();
           return handleErrorInput(replyToken);
         }
       case 'MODIFY':
         // ? 是否為名字輸入狀態
-        if (
-          modifyController.getStatus()
-          // || modifyController.getSubjectStatus()
-        ) {
+        if (modifyController.getStatus() || modifyController.getSubjectStatus_Modify()) {
           // ? 是否符合名字格式
           if (text.match('^m/[\u4e00-\u9fa5a-zA-Z]+$')) {
             console.log('match modify');
-            return modifyController.handleName(replyToken, text);
+            return modifyController.handleName(replyToken, text.split('m/').pop());
+          } else if (['修剪新品', '洗/染', '剪髮', '返修', '其他'].some(item => item == text)) {
+            modifyController.setSubjectStatus_Modify(false);
+            modifyController.setNewSubject(text);
+            return modifyController.confirmModify(replyToken);
+          } else {
+            modifyController.resetNewOrder();
+            return handleErrorInput(replyToken);
           }
-          // else if (['修剪新品', '洗/染', '剪髮', '返修', '其他'].some(item => item == text)) {
-          //   modifyController.setSubjectStatus(false);
-          //   return modifyController.confirmOrder(replyToken, text);
-          // }
-          else {
+        } else if (modifyController.getNameStatus()) {
+          if (text.match('^b/[\u4e00-\u9fa5a-zA-Z]+$')) {
+            console.log('match modifyName');
+            return modifyController.handleModifyName(replyToken, text.split('b/').pop());
+          } else {
+            modifyController.resetNewOrder();
             return handleErrorInput(replyToken);
           }
         } else {
+          modifyController.resetNewOrder();
           return handleErrorInput(replyToken);
         }
       case 'CANCEL':
@@ -103,19 +113,24 @@ function handleText(message, replyToken, source, process) {
     }
   } else {
     switch (text) {
-      // * 預約
+      //* 預約 Book
       case '預約':
       case '新增預約':
       case '新增':
         return BOOK_SERVICE.execute(replyToken);
+      //* 統計 count
       case '查詢人數':
         return COUNT_SERVICE.execute(replyToken);
+      //* 查詢 search
       case '查詢指定客戶':
         return SEARCH_SERVICE.execute(replyToken);
+      //* 修改 modify
       case '修改預約':
         return MODIFY_SERVICE.execute(replyToken);
+      //* 取消 cancel
       case '取消預約':
         return CANCEL_SERVICE.execute(replyToken);
+      //* 檢視 show
       case '檢視預約':
         return SHOW_SERVICE.execute(replyToken);
       case '檢視':
@@ -246,7 +261,7 @@ function handleText(message, replyToken, source, process) {
             },
           },
         });
-
+      //* 其他無效指令
       default:
         console.log(`Echo message to ${replyToken}: ${text}`);
         return client.replyMessage(replyToken, {
@@ -257,7 +272,7 @@ function handleText(message, replyToken, source, process) {
   }
 }
 
-// * Error Input
+/** 處理錯誤指令、格式*/
 function handleErrorInput(replyToken) {
   PROCESS_MANAGER.resetProcess();
   return client.replyMessage(replyToken, {

@@ -1,0 +1,330 @@
+{
+  "type": "carousel",
+  "contents": [
+    {
+      "type": "bubble",
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "text",
+            "text": "訂單明細",
+            "wrap": true,
+            "weight": "bold",
+            "size": "xxl",
+            "color": "#87e8de"
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "客戶姓名",
+                    "size": "sm",
+                    "color": "#555555",
+                    "flex": 0,
+                    "weight": "bold",
+                    "gravity": "center"
+                  },
+                  {
+                    "type": "text",
+                    "text": "陳泉豪",
+                    "size": "lg",
+                    "color": "#111111",
+                    "align": "end",
+                    "weight": "bold",
+                    "gravity": "center"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "預約日期",
+                    "size": "sm",
+                    "color": "#555555",
+                    "flex": 0,
+                    "weight": "bold",
+                    "gravity": "center"
+                  },
+                  {
+                    "type": "text",
+                    "text": "2021-10-03",
+                    "size": "lg",
+                    "color": "#111111",
+                    "align": "end",
+                    "weight": "bold",
+                    "gravity": "center"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "預約時間",
+                    "size": "sm",
+                    "color": "#555555",
+                    "flex": 0,
+                    "weight": "bold",
+                    "gravity": "center"
+                  },
+                  {
+                    "type": "text",
+                    "text": "下午 03:50",
+                    "size": "lg",
+                    "color": "#111111",
+                    "align": "end",
+                    "weight": "bold",
+                    "gravity": "center"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "服務時長",
+                    "size": "sm",
+                    "color": "#555555",
+                    "flex": 0,
+                    "weight": "bold",
+                    "gravity": "center"
+                  },
+                  {
+                    "type": "text",
+                    "text": "90分鐘",
+                    "size": "lg",
+                    "color": "#111111",
+                    "align": "end",
+                    "weight": "bold",
+                    "gravity": "center"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "服務項目",
+                    "size": "sm",
+                    "color": "#555555",
+                    "flex": 0,
+                    "weight": "bold",
+                    "gravity": "center"
+                  },
+                  {
+                    "type": "text",
+                    "text": "剪髮",
+                    "size": "lg",
+                    "color": "#111111",
+                    "align": "end",
+                    "weight": "bold",
+                    "gravity": "center"
+                  }
+                ]
+              }
+            ],
+            "spacing": "sm",
+            "margin": "md"
+          }
+        ]
+      },
+      "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "button",
+            "action": {
+              "type": "uri",
+              "label": "Add to Cart",
+              "uri": "https://linecorp.com"
+            },
+            "color": "#87e8de",
+            "style": "primary"
+          }
+        ]
+      }
+    },
+    {
+      "type": "bubble",
+      "body": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "text",
+            "text": "訂單明細",
+            "wrap": true,
+            "weight": "bold",
+            "size": "xxl"
+          },
+          {
+            "type": "box",
+            "layout": "vertical",
+            "contents": [
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "客戶姓名",
+                    "size": "sm",
+                    "color": "#555555",
+                    "flex": 0,
+                    "weight": "bold",
+                    "gravity": "center"
+                  },
+                  {
+                    "type": "text",
+                    "text": "陳泉豪",
+                    "size": "lg",
+                    "color": "#111111",
+                    "align": "end",
+                    "weight": "bold",
+                    "gravity": "center"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "預約日期",
+                    "size": "sm",
+                    "color": "#555555",
+                    "flex": 0,
+                    "weight": "bold",
+                    "gravity": "center"
+                  },
+                  {
+                    "type": "text",
+                    "text": "2021-10-03",
+                    "size": "lg",
+                    "color": "#111111",
+                    "align": "end",
+                    "weight": "bold",
+                    "gravity": "center"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "預約時間",
+                    "size": "sm",
+                    "color": "#555555",
+                    "flex": 0,
+                    "weight": "bold",
+                    "gravity": "center"
+                  },
+                  {
+                    "type": "text",
+                    "text": "下午 03:50",
+                    "size": "lg",
+                    "color": "#111111",
+                    "align": "end",
+                    "weight": "bold",
+                    "gravity": "center"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "服務時長",
+                    "size": "sm",
+                    "color": "#555555",
+                    "flex": 0,
+                    "weight": "bold",
+                    "gravity": "center"
+                  },
+                  {
+                    "type": "text",
+                    "text": "90分鐘",
+                    "size": "lg",
+                    "color": "#111111",
+                    "align": "end",
+                    "weight": "bold",
+                    "gravity": "center"
+                  }
+                ]
+              },
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "服務項目",
+                    "size": "sm",
+                    "color": "#555555",
+                    "flex": 0,
+                    "weight": "bold",
+                    "gravity": "center"
+                  },
+                  {
+                    "type": "text",
+                    "text": "剪髮",
+                    "size": "lg",
+                    "color": "#111111",
+                    "align": "end",
+                    "weight": "bold",
+                    "gravity": "center"
+                  }
+                ]
+              }
+            ],
+            "spacing": "sm",
+            "margin": "md"
+          }
+        ]
+      },
+      "footer": {
+        "type": "box",
+        "layout": "vertical",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "button",
+            "action": {
+              "type": "uri",
+              "label": "Add to Cart",
+              "uri": "https://linecorp.com"
+            },
+            "color": "#87e8de",
+            "style": "primary"
+          }
+        ]
+      }
+    }
+  ]
+}

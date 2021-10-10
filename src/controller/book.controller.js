@@ -1,5 +1,6 @@
 /** @format */
 
+//* IMPORT
 const moment = require('moment');
 const line = require('@line/bot-sdk');
 const client = new line.Client({
@@ -10,24 +11,27 @@ const db = require('../config/config');
 const HELPER = require('../function/helper');
 const PROCESS_MANAGER = require('../function/processManager');
 
+//* STATUS
+/** name input status */
+let status = false;
+/** subject input status */
+let subjectStatus_book = false;
+//* DATA
 let name = '';
 let date = '';
 let time = '';
 let endTime = '';
 let subject = '';
-
+//* OBJECT
 let order = { name: '', date: '', time: '', endTime: '', subject: '' };
-
-/** name input status */
-let status = false;
-let subjectStatus = false;
-
+//* FUNCTION
 /** 處理姓名輸入
+ * @param text 輸入字串
  * 確認=>存入後，跳出日期選單,
  * 更改=>跳出"請重新輸入姓名"
  */
 function handleName(replyToken, text) {
-  nameInput = text.split('b/').pop();
+  // const nameInput = text.split('b/').pop();
   setStatus(false);
   return client
     .replyMessage(replyToken, {
@@ -35,7 +39,7 @@ function handleName(replyToken, text) {
       altText: '確認客戶姓名',
       template: {
         type: 'buttons',
-        title: '客戶姓名為『' + nameInput + '』',
+        title: '客戶姓名為『' + text + '』',
         text: '請確認名字是否相符',
         actions: [
           {
@@ -57,15 +61,18 @@ function handleName(replyToken, text) {
     })
     .then(() => {
       // 存入客戶姓名
-      setName(text.split('b/').pop());
+      setName(text);
     });
 }
 
 /** 處理日期輸入
+ * @param postback 選擇的日期.
+ * @description
  * 確認=>存入後，跳出時間選單,
  * 更改=>清空日期，跳出日期選單
  */
 function handleDate(replyToken, postback) {
+  // 有選擇日期 且 未存下選擇的日期時
   if (postback.params.date && getDate() == '') {
     return client
       .replyMessage(replyToken, {
@@ -107,6 +114,7 @@ function handleDate(replyToken, postback) {
  * 更改=>清空時間，跳出時間選單
  */
 function handleTime(replyToken, postback) {
+  // 有選擇時間 且 未存下選擇的時間時
   if (postback.params.time && getTime() == '') {
     let timeChange = HELPER.timeChange(postback.params.time);
     return client
@@ -271,8 +279,7 @@ function handleSubject(replyToken) {
 }
 
 /** 確認完整預約 */
-function confirmOrder(replyToken, text) {
-  setSubject(text);
+function confirmBook(replyToken) {
   return client.replyMessage(replyToken, {
     type: 'flex',
     altText: '確認預約內容',
@@ -428,7 +435,7 @@ function confirmOrder(replyToken, text) {
                   },
                   {
                     type: 'text',
-                    text: text,
+                    text: subject,
                     size: 'lg',
                     color: '#111111',
                     align: 'end',
@@ -476,18 +483,24 @@ function confirmOrder(replyToken, text) {
   });
 }
 
-/** 確認-預約 */
+/** 確認-預約
+ * @return
+ * @description
+ */
 function book(replyToken) {
   setStatus(true);
   return client.replyMessage(replyToken, [
     {
       type: 'text',
-      text: '請輸入客戶姓名',
+      text: '請輸入客戶姓名(格式為b/xx)',
     },
   ]);
 }
 
-/** 取消-預約 */
+/** 取消-預約
+ * @return
+ * @description
+ */
 function cancelBook(replyToken) {
   // 結束流程
   PROCESS_MANAGER.resetProcess();
@@ -498,7 +511,10 @@ function cancelBook(replyToken) {
   });
 }
 
-/** 預約流程中，更改客戶姓名 */
+/** 預約流程中，更改客戶姓名
+ * @return
+ * @description
+ */
 function modifyName(replyToken) {
   // 清空姓名
   setName('');
@@ -507,13 +523,16 @@ function modifyName(replyToken) {
   return client.replyMessage(replyToken, [
     {
       type: 'text',
-      text: '請重新填寫客戶姓名',
+      text: '請重新填寫客戶姓名(格式為b/xx)',
     },
   ]);
 }
 
-/** 送交，存入DB */
-function submit(replyToken) {
+/** 送交，存入DB
+ * @return
+ * @description
+ */
+function submitBook(replyToken) {
   const sqlSelect =
     'INSERT INTO `order` (`name`, `date`, `time`, `endTime`, `subject`) VALUES (?, ?, ?, ?, ?)';
   db.query(sqlSelect, [name, date, time, endTime, subject], (err, result) => {
@@ -712,17 +731,23 @@ function submit(replyToken) {
   });
 }
 
-// * 資料清空
+/** 資料清空
+ * @return
+ * @description
+ */
 function resetOrder() {
   status = false;
-  subjectStatus = false;
+  subjectStatus_book = false;
   setName('');
   setDate('');
   setTime('');
   setEndTime('');
   setSubject('');
 }
-
+/**
+ * @return
+ * @description
+ * */
 function setOrder(name, date, time, endTime, subject) {
   order.name = name;
   order.date = date;
@@ -741,12 +766,12 @@ function getStatus() {
 }
 
 /** 設置項目流程 */
-function setSubjectStatus(process) {
-  subjectStatus = process;
+function setSubjectStatus_Book(process) {
+  subjectStatus_book = process;
 }
 
-function getSubjectStatus() {
-  return subjectStatus;
+function getSubjectStatus_Book() {
+  return subjectStatus_book;
 }
 
 function getName() {
@@ -796,8 +821,8 @@ module.exports = {
   handleDateTime,
   handleSubject,
   handleEndTime,
-  confirmOrder,
-  submit,
+  confirmBook,
+  submitBook,
   book,
   cancelBook,
   modifyName,
@@ -805,8 +830,8 @@ module.exports = {
   setOrder,
   getStatus,
   setStatus,
-  getSubjectStatus,
-  setSubjectStatus,
+  getSubjectStatus_Book,
+  setSubjectStatus_Book,
   getName,
   setName,
   getDate,

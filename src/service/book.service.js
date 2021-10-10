@@ -7,6 +7,8 @@ const client = new line.Client({
 });
 const PROCESS_MANAGER = require('../function/processManager');
 const bookController = require('../controller/book.controller');
+
+/** Book init*/
 function execute(replyToken) {
   PROCESS_MANAGER.setProcess('book');
   bookController.setOrder('', '', '', '', '');

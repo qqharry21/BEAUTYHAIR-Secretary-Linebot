@@ -1,49 +1,1137 @@
 /** @format */
-const axios = require('axios');
 
+//* IMPORT
+const moment = require('moment');
+const line = require('@line/bot-sdk');
+const client = new line.Client({
+  channelAccessToken: process.env['CHANNEL_ACCESS_TOKEN'],
+  channelSecret: process.env['CHANNEL_SECRET'],
+});
+const db = require('../config/config');
+const HELPER = require('../function/helper');
+const PROCESS_MANAGER = require('../function/processManager');
+
+//* STATUS
 /** 輸入名字狀態 - modify */
 let status = false;
-
-/** 更改客戶姓名 */
-let modifyName = '';
-
-/** 所有相關 */
+/** 選取預約的狀態 */
+let chosenStatus = false;
+/** 輸入更改後的名字狀態 */
+let nameStatus = false;
+/** 選取更改subject時的狀態 */
+let subjectStatus_modify = false;
+//* FIRST INPUT
+/** 查詢要更改的客戶姓名 */
+let modifyNameInput = '';
+//* LIST
+/** 相關預約List */
 let modifyList = [];
-
-/** 欲更改的預約資料 */
-let data = {
-  selectName: '',
-  selectDate: '',
-  selectTime: '',
-  selectEndTime: '',
-  selectSubject: '',
+/** 相關預約List的Content */
+let modifyListContent = [];
+//* OBJECT
+/** 更改的預約資料 */
+let newOrder = {
+  mid: '',
+  newName: '',
+  newDate: '',
+  newTime: '',
+  newEndTime: '',
+  newSubject: '',
 };
-
-/** 確認-更改預約 */
+//* FUNCTION
+/** 確認-更改預約
+ * @return message
+ * @description 請輸入預約的客戶姓名
+ */
 function modify(replyToken) {
   setStatus(true);
   return client.replyMessage(replyToken, {
     type: 'text',
-    text: '請輸入欲更改預約的客戶姓名(格式為m/xx)',
+    text: '請輸入預約的客戶姓名(格式為m/xx)',
   });
 }
 
-/** 取消-更改預約 */
+/** 取消-更改預約
+ * @return message
+ * @description 取消更改預約流程
+ */
 function cancelModify(replyToken) {
   // 結束流程
   PROCESS_MANAGER.resetProcess();
-  resetOrder();
+  resetNewOrder();
   return client.replyMessage(replyToken, {
     type: 'text',
     text: '取消更改預約流程',
   });
 }
 
-function handleName(replyToken, text) {
-
+/** 清空資料
+ * @description 所有參數回復初始值
+ */
+function resetNewOrder() {
+  status = false;
+  chosenStatus = false;
+  nameStatus = false;
+  subjectStatus = false;
+  setNewName('');
+  setNewDate('');
+  setNewTime('');
+  setNewEndTime('');
+  setNewSubject('');
 }
 
-/** 設置名字輸入狀態 */
+/** 向資料庫抓取所有相關預約
+ * @description 向DB索取資料
+ * @return 抓取到的資料/false
+ */
+function fetchModifyList(text) {
+  const sqlSelect =
+    'SELECT `id`, `name`, `date`, `time`, `endTime`, `subject` FROM `order` WHERE `name` = ? ORDER BY ABS( DATEDIFF( `date`, NOW() ) ) ,`create_time` DESC';
+  db.query(sqlSelect, [text], (err, result) => {
+    if (result) {
+      return result;
+    } else {
+      console.log('fetch error', err);
+      return false;
+    }
+  });
+}
+
+/** 處理姓名輸入
+ * @param text 輸入字串
+ * @description
+ * 有資料=>選取其中一筆 ; 無資料=>跳出無資料訊息
+ */
+function handleName(replyToken, text) {
+  const result = fetchModifyList(text);
+  if (result) {
+    console.log('result', result);
+    result.forEach(function (item, index) {
+      if (index < 12) {
+        modifyList.push(item);
+        modifyListContent.push({
+          type: 'bubble',
+          body: {
+            type: 'box',
+            layout: 'vertical',
+            spacing: 'sm',
+            contents: [
+              {
+                type: 'text',
+                text: `預約明細-${index + 1}`,
+                wrap: true,
+                weight: 'bold',
+                size: 'xxl',
+                color: '#87e8de',
+              },
+              {
+                type: 'box',
+                layout: 'vertical',
+                contents: [
+                  {
+                    type: 'box',
+                    layout: 'horizontal',
+                    contents: [
+                      {
+                        type: 'text',
+                        text: '客戶姓名',
+                        size: 'sm',
+                        color: '#555555',
+                        flex: 0,
+                        weight: 'bold',
+                        gravity: 'center',
+                      },
+                      {
+                        type: 'text',
+                        text: item.name,
+                        size: 'lg',
+                        color: '#111111',
+                        align: 'end',
+                        weight: 'bold',
+                        gravity: 'center',
+                      },
+                    ],
+                  },
+                  {
+                    type: 'box',
+                    layout: 'horizontal',
+                    contents: [
+                      {
+                        type: 'text',
+                        text: '預約日期',
+                        size: 'sm',
+                        color: '#555555',
+                        flex: 0,
+                        weight: 'bold',
+                        gravity: 'center',
+                      },
+                      {
+                        type: 'text',
+                        text: item.date,
+                        size: 'lg',
+                        color: '#111111',
+                        align: 'end',
+                        weight: 'bold',
+                        gravity: 'center',
+                      },
+                    ],
+                  },
+                  {
+                    type: 'box',
+                    layout: 'horizontal',
+                    contents: [
+                      {
+                        type: 'text',
+                        text: '預約時間',
+                        size: 'sm',
+                        color: '#555555',
+                        flex: 0,
+                        weight: 'bold',
+                        gravity: 'center',
+                      },
+                      {
+                        type: 'text',
+                        text: HELPER.timeChange(item.time),
+                        size: 'lg',
+                        color: '#111111',
+                        align: 'end',
+                        weight: 'bold',
+                        gravity: 'center',
+                      },
+                    ],
+                  },
+                  {
+                    type: 'box',
+                    layout: 'horizontal',
+                    contents: [
+                      {
+                        type: 'text',
+                        text: '服務時長',
+                        size: 'sm',
+                        color: '#555555',
+                        flex: 0,
+                        weight: 'bold',
+                        gravity: 'center',
+                      },
+                      {
+                        type: 'text',
+                        text: item.endTime,
+                        size: 'lg',
+                        color: '#111111',
+                        align: 'end',
+                        weight: 'bold',
+                        gravity: 'center',
+                      },
+                    ],
+                  },
+                  {
+                    type: 'box',
+                    layout: 'horizontal',
+                    contents: [
+                      {
+                        type: 'text',
+                        text: '服務項目',
+                        size: 'sm',
+                        color: '#555555',
+                        flex: 0,
+                        weight: 'bold',
+                        gravity: 'center',
+                      },
+                      {
+                        type: 'text',
+                        text: item.subject,
+                        size: 'lg',
+                        color: '#111111',
+                        align: 'end',
+                        weight: 'bold',
+                        gravity: 'center',
+                      },
+                    ],
+                  },
+                ],
+                spacing: 'sm',
+                margin: 'md',
+              },
+            ],
+          },
+          footer: {
+            type: 'box',
+            layout: 'vertical',
+            spacing: 'sm',
+            contents: [
+              {
+                type: 'button',
+                action: {
+                  type: 'postback',
+                  label: '選擇',
+                  data: `choose${index}`,
+                },
+                color: '#87e8de',
+                style: 'primary',
+              },
+            ],
+          },
+        });
+      }
+    });
+    return client
+      .replyMessage(replyToken, [
+        {
+          type: 'flex',
+          altText: '該客戶相關預約列表',
+          contents: {
+            type: 'carousel',
+            contents: modifyListContent,
+          },
+        },
+      ])
+      .then(() => {
+        setChosenStatus(true);
+      });
+  } else {
+    return client.replyMessage(replyToken, {
+      type: 'text',
+      text: '未找到該客戶的預約，請重新點選該功能!',
+    });
+  }
+}
+
+/** 選擇預約後
+ * @from modifyList
+ * @param index Array 位置
+ * @return message
+ * @description 選擇欲更改的預約內容
+ */
+function choose(replyToken, index) {
+  // 防止再次點選其他預約選項
+  setChosenStatus(false);
+  // 將該筆存下至Object
+  setNewOrder(
+    modifyList[index].id,
+    modifyList[index].name,
+    modifyList[index].date,
+    modifyList[index].time,
+    modifyList[index].endTime,
+    modifyList[index].subject
+  );
+  return client.replyMessage(replyToken, [
+    {
+      type: 'flex',
+      altText: '請選擇欲更改內容',
+      contents: {
+        type: 'bubble',
+        body: {
+          type: 'box',
+          layout: 'vertical',
+          contents: [
+            {
+              type: 'text',
+              text: getNewName(),
+              weight: 'bold',
+              size: 'xxl',
+              color: '#87e8de',
+            },
+            {
+              type: 'box',
+              layout: 'vertical',
+              margin: 'lg',
+              spacing: 'sm',
+              contents: [
+                {
+                  type: 'box',
+                  layout: 'baseline',
+                  spacing: 'sm',
+                  contents: [
+                    {
+                      type: 'text',
+                      text: '日期 / 時間',
+                      color: '#333333',
+                      size: 'sm',
+                      flex: 2,
+                      weight: 'bold',
+                    },
+                    {
+                      type: 'text',
+                      text: getNewDate() + ' / ' + HELPER.timeChange(getNewTime()),
+                      wrap: true,
+                      size: 'md',
+                      flex: 5,
+                      align: 'end',
+                      color: '#111111',
+                      weight: 'bold',
+                    },
+                  ],
+                },
+                {
+                  type: 'box',
+                  layout: 'baseline',
+                  spacing: 'sm',
+                  contents: [
+                    {
+                      type: 'text',
+                      text: '服務時程 / 項目',
+                      color: '#333333',
+                      size: 'sm',
+                      flex: 2,
+                      weight: 'bold',
+                    },
+                    {
+                      type: 'text',
+                      text: getNewEndTime() + ' / ' + getNewSubject(),
+                      wrap: true,
+                      color: '#111111',
+                      size: 'md',
+                      flex: 3,
+                      align: 'end',
+                      weight: 'bold',
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              type: 'text',
+              text: '請選擇欲更改內容',
+              align: 'center',
+              size: 'sm',
+              offsetTop: '6px',
+              color: '#aaaaaa',
+            },
+            {
+              type: 'separator',
+              margin: 'xl',
+            },
+          ],
+        },
+        footer: {
+          type: 'box',
+          layout: 'vertical',
+          spacing: 'sm',
+          contents: [
+            {
+              type: 'button',
+              style: 'primary',
+              height: 'sm',
+              action: {
+                type: 'postback',
+                label: '客戶姓名',
+                data: 'modifyName',
+                displayText: '更改客戶姓名',
+              },
+              color: '#87e8de',
+            },
+            {
+              type: 'button',
+              style: 'primary',
+              height: 'sm',
+              action: {
+                label: '預約日期',
+                type: 'datetimepicker',
+                mode: 'date',
+                initial: moment().format('YYYY-MM-DD'),
+                max: moment().add(6, 'months').format('YYYY-MM-DD'),
+                min: moment().format('YYYY-MM-DD'),
+                data: 'modifyDate',
+              },
+              color: '#87e8de',
+            },
+            {
+              type: 'button',
+              style: 'primary',
+              height: 'sm',
+              action: {
+                label: '預約時間',
+                type: 'datetimepicker',
+                mode: 'time',
+                initial: '10:00',
+                data: 'modifyTime',
+              },
+              color: '#87e8de',
+            },
+            {
+              type: 'button',
+              style: 'primary',
+              height: 'sm',
+              action: {
+                type: 'postback',
+                label: '服務時程',
+                data: 'modifyEndTime',
+                displayText: '更改服務時程',
+              },
+              color: '#87e8de',
+            },
+            {
+              type: 'button',
+              style: 'primary',
+              height: 'sm',
+              action: {
+                type: 'postback',
+                label: '服務項目',
+                data: 'modifySubject',
+                displayText: '更改服務項目',
+              },
+              color: '#87e8de',
+            },
+          ],
+          flex: 0,
+        },
+      },
+    },
+  ]);
+  // .then(() => {
+  //   setSelectStatus(true);
+  // });
+}
+
+/** 重新輸入名字
+ * @return message
+ * @description 請重新填寫客戶姓名
+ */
+function modify_modifyName(replyToken) {
+  setNameStatus(true);
+  return client.replyMessage(replyToken, [
+    {
+      type: 'text',
+      text: '請重新填寫客戶姓名(格式為b/xx)',
+    },
+  ]);
+}
+
+/** 處理更改後的客戶姓名
+ * @param text 更改後的客戶姓名
+ * @description 確認名字是否正確
+ */
+function handleModifyName(replyToken, text) {
+  // 取消modify輸入名字狀態
+  setNameStatus(false);
+  return client
+    .replyMessage(replyToken, {
+      type: 'template',
+      altText: '確認客戶姓名',
+      template: {
+        type: 'buttons',
+        title: '客戶姓名為『' + text + '』',
+        text: '請確認名字是否相符',
+        actions: [
+          {
+            label: '確認',
+            type: 'postback',
+            data: 'confirm',
+          },
+          {
+            label: '修改',
+            type: 'postback',
+            data: 'modifyName',
+          },
+        ],
+      },
+    })
+    .then(() => {
+      // 存入客戶姓名
+      setNewName(text);
+    });
+}
+
+/** 處理更改後的預約日期
+ * @param postback 選擇更改的預約日期
+ * @description 確認日期是否正確
+ */
+function modifyDate(replyToken, postback) {
+  //? 有選擇日期 且 未存下選擇的日期時
+  if (postback.params.date && getNewDate() == '') {
+    return client
+      .replyMessage(replyToken, {
+        type: 'template',
+        altText: '請確認日期',
+        template: {
+          type: 'buttons',
+          title: '預約日期為『' + postback.params.date + '』',
+          text: '請確認日期',
+          actions: [
+            {
+              label: '確認',
+              type: 'postback',
+              data: 'confirm',
+            },
+            {
+              label: '修改',
+              type: 'datetimepicker',
+              mode: 'date',
+              initial: moment().format('YYYY-MM-DD'),
+              max: moment().add(6, 'months').format('YYYY-MM-DD'),
+              min: moment().format('YYYY-MM-DD'),
+              data: 'modifyDate',
+            },
+          ],
+        },
+      })
+      .then(() => {
+        // 存入日期
+        setNewDate(postback.params.date);
+      });
+  }
+}
+
+/** 處理更改後的預約時間
+ * @param postback 選擇更改的預約時間
+ * @description 確認時間是否正確
+ */
+function modifyTime(replyToken, postback) {
+  // 有選擇時間 且 未存下選擇的時間時
+  if (postback.params.time && getNewTime() == '') {
+    let timeChange = HELPER.timeChange(postback.params.time);
+    return client
+      .replyMessage(replyToken, {
+        type: 'template',
+        altText: '請確認時間',
+        template: {
+          type: 'buttons',
+          title: '預約時間為『' + timeChange + '』',
+          text: '請確認時間',
+          actions: [
+            {
+              label: '確認',
+              type: 'postback',
+              data: 'confirm',
+            },
+            {
+              label: '修改',
+              type: 'datetimepicker',
+              mode: 'time',
+              initial: '10:00',
+              data: 'modifyTime',
+            },
+          ],
+        },
+      })
+      .then(() => {
+        // 存入時間
+        setNewTime(postback.params.time);
+      });
+  }
+}
+
+/** 選擇欲更改的服務時程
+ * @description 選擇服務時程
+ */
+function modifyEndTime(replyToken) {
+  return client.replyMessage(replyToken, {
+    type: 'template',
+    altText: '選擇大約需花費時間',
+    template: {
+      type: 'buttons',
+      title: '選擇大約需花費時間',
+      text: '請確認時間區間',
+      actions: [
+        {
+          label: '30分鐘',
+          type: 'postback',
+          displayText: '30分鐘',
+          data: 'endTime30',
+        },
+        {
+          label: '60分鐘',
+          type: 'postback',
+          displayText: '60分鐘',
+          data: 'endTime60',
+        },
+        {
+          label: '90分鐘',
+          type: 'postback',
+          displayText: '90分鐘',
+          data: 'endTime90',
+        },
+        {
+          label: '120分鐘',
+          type: 'postback',
+          displayText: '120分鐘',
+          data: 'endTime120',
+        },
+      ],
+    },
+  });
+}
+
+/** 選擇欲更改的服務項目
+ * @description 選擇項目
+ */
+function modifySubject(replyToken) {
+  return client.replyMessage(replyToken, {
+    type: 'text',
+    text: '請選擇服務項目',
+    quickReply: {
+      items: [
+        {
+          type: 'action',
+          imageUrl: 'https://img.icons8.com/office/50/000000/new.png',
+          action: {
+            label: '修剪新品',
+            type: 'message',
+            text: '修剪新品',
+          },
+        },
+        {
+          type: 'action',
+          imageUrl: 'https://img.icons8.com/offices/50/000000/hair-washing-sink.png',
+          action: {
+            label: '洗/染',
+            type: 'message',
+            text: '洗/染',
+          },
+        },
+        {
+          type: 'action',
+          imageUrl: 'https://img.icons8.com/color/48/000000/hairdresser.png',
+          action: {
+            label: '剪髮',
+            type: 'message',
+            text: '剪髮',
+          },
+        },
+        {
+          type: 'action',
+          imageUrl: 'https://img.icons8.com/offices/50/000000/barber-chair.png',
+          action: {
+            label: '返修',
+            type: 'message',
+            text: '返修',
+          },
+        },
+        {
+          type: 'action',
+          imageUrl:
+            'https://img.icons8.com/external-those-icons-lineal-color-those-icons/24/000000/external-barber-barber-shop-those-icons-lineal-color-those-icons.png',
+          action: {
+            label: '其他',
+            type: 'message',
+            text: '其他',
+          },
+        },
+      ],
+    },
+  });
+}
+
+/** 確認更改內容
+ * @return
+ * @description 可再點選其他欲更改項目
+ */
+function confirmModify(replyToken) {
+  console.log('in');
+  console.log(newOrder);
+  return client.replyMessage(replyToken, [
+    {
+      type: 'flex',
+      altText: '請確認更改內容',
+      contents: {
+        type: 'bubble',
+        body: {
+          type: 'box',
+          layout: 'vertical',
+          contents: [
+            {
+              type: 'text',
+              text: '請確認更改內容',
+            },
+            {
+              type: 'box',
+              layout: 'vertical',
+              margin: 'lg',
+              spacing: 'sm',
+              contents: [
+                {
+                  type: 'box',
+                  layout: 'baseline',
+                  contents: [
+                    {
+                      type: 'text',
+                      text: '客戶姓名',
+                      color: '#333333',
+                      size: 'sm',
+                      flex: 2,
+                      weight: 'bold',
+                    },
+                    {
+                      type: 'text',
+                      text: getNewName(),
+                      weight: 'bold',
+                      size: 'xxl',
+                      color: '#87e8de',
+                      flex: 3,
+                      align: 'end',
+                    },
+                  ],
+                },
+                {
+                  type: 'box',
+                  layout: 'baseline',
+                  spacing: 'sm',
+                  contents: [
+                    {
+                      type: 'text',
+                      text: '日期 / 時間',
+                      color: '#333333',
+                      size: 'sm',
+                      flex: 2,
+                      weight: 'bold',
+                    },
+                    {
+                      type: 'text',
+                      text: getNewDate() + ' / ' + getNewTime(),
+                      wrap: true,
+                      size: 'md',
+                      flex: 5,
+                      align: 'end',
+                      color: '#111111',
+                      weight: 'bold',
+                    },
+                  ],
+                },
+                {
+                  type: 'box',
+                  layout: 'baseline',
+                  spacing: 'sm',
+                  contents: [
+                    {
+                      type: 'text',
+                      text: '服務時程 / 項目',
+                      color: '#333333',
+                      size: 'sm',
+                      flex: 2,
+                      weight: 'bold',
+                    },
+                    {
+                      type: 'text',
+                      text: getNewEndTime() + ' / ' + getNewSubject(),
+                      wrap: true,
+                      color: '#111111',
+                      size: 'md',
+                      flex: 3,
+                      align: 'end',
+                      weight: 'bold',
+                    },
+                  ],
+                },
+              ],
+            },
+            {
+              type: 'text',
+              text: '請選擇欲更改內容',
+              align: 'center',
+              size: 'sm',
+              offsetTop: '6px',
+              color: '#aaaaaa',
+            },
+            {
+              type: 'separator',
+              margin: 'xl',
+            },
+          ],
+        },
+        footer: {
+          type: 'box',
+          layout: 'vertical',
+          spacing: 'sm',
+          contents: [
+            {
+              type: 'button',
+              style: 'primary',
+              height: 'sm',
+              action: {
+                type: 'postback',
+                label: '客戶姓名',
+                data: 'modifyName',
+                displayText: '更改客戶姓名',
+              },
+              color: '#87e8de',
+            },
+            {
+              type: 'button',
+              style: 'primary',
+              height: 'sm',
+              action: {
+                label: '預約日期',
+                type: 'datetimepicker',
+                mode: 'date',
+                initial: moment().format('YYYY-MM-DD'),
+                max: moment().add(6, 'months').format('YYYY-MM-DD'),
+                min: moment().format('YYYY-MM-DD'),
+                data: 'modifyDate',
+              },
+              color: '#87e8de',
+            },
+            {
+              type: 'button',
+              style: 'primary',
+              height: 'sm',
+              action: {
+                label: '預約時間',
+                type: 'datetimepicker',
+                mode: 'time',
+                initial: '10:00',
+                data: 'modifyTime',
+              },
+              color: '#87e8de',
+            },
+            {
+              type: 'button',
+              style: 'primary',
+              height: 'sm',
+              action: {
+                type: 'postback',
+                label: '服務時程',
+                data: 'modifyEndTime',
+                displayText: '更改服務時程',
+              },
+              color: '#87e8de',
+            },
+            {
+              type: 'button',
+              style: 'primary',
+              height: 'sm',
+              action: {
+                type: 'postback',
+                label: '服務項目',
+                data: 'modifySubject',
+                displayText: '更改服務項目',
+              },
+              color: '#87e8de',
+            },
+            {
+              type: 'button',
+              action: {
+                type: 'postback',
+                label: '確認更改',
+                data: 'submitModify',
+              },
+              style: 'primary',
+              height: 'sm',
+              color: '#111111',
+            },
+          ],
+          flex: 0,
+        },
+      },
+    },
+  ]);
+}
+
+/** 送交，存入DB
+ * @return
+ * @description
+ */
+function submitModify(replyToken) {
+  const sqlSelect =
+    'UPDATE `order` SET `name` = ? , `date` = ? , `time` = ? , `endTime` = ? , `subject` = ? WHERE `id` = ?';
+  db.query(
+    sqlSelect,
+    [
+      newOrder.newName,
+      newOrder.newDate,
+      newOrder.newTime,
+      newOrder.newEndTime,
+      newOrder.newSubject,
+      newOrder.mid,
+    ],
+    (err, result) => {
+      if (err) {
+        resetNewOrder();
+        PROCESS_MANAGER.resetProcess();
+        return client.replyMessage(replyToken, { type: 'text', text: '發生錯誤，請通知管理員' });
+      } else {
+        PROCESS_MANAGER.resetProcess();
+        return client.replyMessage(replyToken, {
+          type: 'flex',
+          altText: 'this is a flex message',
+          contents: {
+            type: 'bubble',
+            body: {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                {
+                  type: 'box',
+                  layout: 'horizontal',
+                  contents: [
+                    {
+                      type: 'image',
+                      url: 'https://img.icons8.com/cotton/48/000000/checkmark.png',
+                      size: 'xs',
+                      position: 'relative',
+                      align: 'start',
+                    },
+                    {
+                      type: 'text',
+                      text: '更改成功',
+                      weight: 'bold',
+                      size: '32px',
+                      margin: 'none',
+                      color: '#87e8de',
+                      decoration: 'none',
+                      align: 'start',
+                      gravity: 'center',
+                    },
+                  ],
+                },
+                {
+                  type: 'separator',
+                  margin: 'xxl',
+                },
+                {
+                  type: 'text',
+                  text: '預約明細',
+                  size: 'xs',
+                  color: '#aaaaaa',
+                  wrap: true,
+                  margin: 'md',
+                  align: 'center',
+                },
+                {
+                  type: 'box',
+                  layout: 'vertical',
+                  margin: 'md',
+                  spacing: 'sm',
+                  contents: [
+                    {
+                      type: 'box',
+                      layout: 'horizontal',
+                      contents: [
+                        {
+                          type: 'text',
+                          text: '客戶姓名',
+                          size: 'sm',
+                          color: '#555555',
+                          flex: 0,
+                          weight: 'bold',
+                          gravity: 'center',
+                        },
+                        {
+                          type: 'text',
+                          text: newOrder.newName,
+                          size: 'lg',
+                          color: '#111111',
+                          align: 'end',
+                          weight: 'bold',
+                          gravity: 'center',
+                        },
+                      ],
+                    },
+                    {
+                      type: 'box',
+                      layout: 'horizontal',
+                      contents: [
+                        {
+                          type: 'text',
+                          text: '預約日期',
+                          size: 'sm',
+                          color: '#555555',
+                          flex: 0,
+                          weight: 'bold',
+                          gravity: 'center',
+                        },
+                        {
+                          type: 'text',
+                          text: newOrder.newDate,
+                          size: 'lg',
+                          color: '#111111',
+                          align: 'end',
+                          weight: 'bold',
+                          gravity: 'center',
+                        },
+                      ],
+                    },
+                    {
+                      type: 'box',
+                      layout: 'horizontal',
+                      contents: [
+                        {
+                          type: 'text',
+                          text: '預約時間',
+                          size: 'sm',
+                          color: '#555555',
+                          flex: 0,
+                          weight: 'bold',
+                          gravity: 'center',
+                        },
+                        {
+                          type: 'text',
+                          text: HELPER.timeChange(newOrder.newTime),
+                          size: 'lg',
+                          color: '#111111',
+                          align: 'end',
+                          weight: 'bold',
+                          gravity: 'center',
+                        },
+                      ],
+                    },
+                    {
+                      type: 'box',
+                      layout: 'horizontal',
+                      contents: [
+                        {
+                          type: 'text',
+                          text: '服務時長',
+                          size: 'sm',
+                          color: '#555555',
+                          flex: 0,
+                          weight: 'bold',
+                          gravity: 'center',
+                        },
+                        {
+                          type: 'text',
+                          text: newOrder.newEndTime,
+                          size: 'lg',
+                          color: '#111111',
+                          align: 'end',
+                          weight: 'bold',
+                          gravity: 'center',
+                        },
+                      ],
+                    },
+                    {
+                      type: 'box',
+                      layout: 'horizontal',
+                      contents: [
+                        {
+                          type: 'text',
+                          text: '服務項目',
+                          size: 'sm',
+                          color: '#555555',
+                          flex: 0,
+                          weight: 'bold',
+                          gravity: 'center',
+                        },
+                        {
+                          type: 'text',
+                          text: newOrder.newSubject,
+                          size: 'lg',
+                          color: '#111111',
+                          align: 'end',
+                          weight: 'bold',
+                          gravity: 'center',
+                        },
+                      ],
+                    },
+                  ],
+                },
+              ],
+            },
+            styles: {
+              footer: {
+                separator: true,
+              },
+            },
+          },
+        });
+      }
+    }
+  );
+}
+
+/** 設置名字輸入狀態
+ * @true 允許輸入m/xx
+ * @false 不允許輸入m/xx
+ */
 function setStatus(process) {
   status = process;
 }
@@ -53,32 +1141,145 @@ function getStatus() {
   return status;
 }
 
+/** 設置選擇欲更改預約的狀態
+ * @true 已抓取List
+ * @false 抓取List發生錯誤
+ */
+function setChosenStatus(process) {
+  chosenStatus = process;
+}
+
+/** 抓取選擇欲更改預約的狀態 */
+function getChosenStatus() {
+  return chosenStatus;
+}
+
+/** 設置選擇欲更改預約的狀態
+ * @true 允許輸入b/xx
+ * @false 不允許輸入b/xx
+ */
+function setNameStatus(process) {
+  nameStatus = process;
+}
+
+/** 抓取選擇欲更改預約的狀態 */
+function getNameStatus() {
+  return nameStatus;
+}
+
+/** 設置項目流程 */
+function setSubjectStatus_Modify(process) {
+  subjectStatus_modify = process;
+}
+
+function getSubjectStatus_Modify() {
+  return subjectStatus_modify;
+}
+
 /** 設置查詢名字 */
-function setModifyName(name) {
-  modifyName = name;
+function setModifyNameInput(name) {
+  modifyNameInput = name;
 }
 
 /** 抓取查詢名字 */
-function getModifyName() {
-  return modifyName;
+function getModifyNameInput() {
+  return modifyNameInput;
 }
 
-/** 向資料庫抓取所有相關預約 */
-async function getModifyList() {
-  const res = await axios.get('');
+/** 設置該欲更改的客戶姓名 */
+function setNewName(data) {
+  newOrder.newName = data;
 }
 
-/** 選擇該欲更改的預約 */
-// function handleSelect() {}
+function getNewName() {
+  return newOrder.newName;
+}
+
+function setNewDate(data) {
+  newOrder.newDate = data;
+}
+
+function getNewDate() {
+  return newOrder.newDate;
+}
+
+function setNewTime(data) {
+  newOrder.newTime = data;
+}
+
+function getNewTime() {
+  return newOrder.newTime;
+}
+
+function setNewEndTime(data) {
+  newOrder.newEndTime = data;
+}
+
+function getNewEndTime() {
+  return newOrder.newEndTime;
+}
+
+function setNewSubject(data) {
+  newOrder.newSubject = data;
+}
+
+function getNewSubject() {
+  return newOrder.newSubject;
+}
+
+function setNewOrder(id, name, date, time, endTime, subject) {
+  newOrder.mid = id;
+  newOrder.newName = name;
+  newOrder.newDate = date;
+  newOrder.newTime = time;
+  newOrder.newEndTime = endTime;
+  newOrder.newSubject = subject;
+}
+
+function setSelectStatus(process) {
+  selectStatus = process;
+}
+
+function getSelectStatus() {
+  return selectStatus;
+}
 
 module.exports = {
   handleName,
   modify,
   cancelModify,
+  choose,
+  modify_modifyName,
+  modifyDate,
+  modifyTime,
+  modifyEndTime,
+  modifySubject,
+  handleModifyName,
   setStatus,
   getStatus,
-  setModifyName,
-  getModifyName,
-  getModifyList,
-  // handleSelect,
+  setChosenStatus,
+  getChosenStatus,
+  setNameStatus,
+  getNameStatus,
+  setModifyNameInput,
+  getModifyNameInput,
+  fetchModifyList,
+  getNewName,
+  setNewName,
+  getNewDate,
+  setNewDate,
+  getNewTime,
+  setNewTime,
+  getNewEndTime,
+  setNewEndTime,
+  getNewSubject,
+  setNewSubject,
+  setSubjectStatus_Modify,
+  getSubjectStatus_Modify,
+  setNewOrder,
+  resetNewOrder,
+  setSelectStatus,
+  getSelectStatus,
+  confirmModify,
+  submitModify,
 };
