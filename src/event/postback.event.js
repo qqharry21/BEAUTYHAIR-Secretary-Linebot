@@ -5,36 +5,41 @@ const client = new line.Client({
   channelAccessToken: process.env['CHANNEL_ACCESS_TOKEN'],
   channelSecret: process.env['CHANNEL_SECRET'],
 });
-// const BOOK_SERVICE = require('./book.service');
 const bookController = require('../controller/book.controller');
 const modifyController = require('../controller/modify.controller');
-const PROCESS_MANAGER = require('../function/processManager');
+const cancelController = require('../controller/cancel.controller');
+const countController = require('../controller/count.controller');
+const showController = require('../controller/show.controller');
+const PROCESS_MANAGER = require('../manager/processManager');
 
 function execute(replyToken, postback, process) {
   // 判斷是否為功能流程中
   switch (process) {
     case 'BOOK':
+      //? 是否為選擇endTime時程狀態
       if (postback.data.match('^endTime[0-9]')) {
         const range = postback.data.split('endTime').pop();
         switch (range) {
           case '30':
-            bookController.setEndTime('30分鐘');
+            bookController.setEndTime(range);
             return bookController.handleDateTime(replyToken, postback);
           case '60':
-            bookController.setEndTime('60分鐘');
+            bookController.setEndTime(range);
             return bookController.handleDateTime(replyToken, postback);
           case '90':
-            bookController.setEndTime('90分鐘');
+            bookController.setEndTime(range);
             return bookController.handleDateTime(replyToken, postback);
           case '120':
-            bookController.setEndTime('120分鐘');
+            bookController.setEndTime(range);
             return bookController.handleDateTime(replyToken, postback);
         }
-      } else {
+      }
+      //? 為book流程中的postback
+      else {
         switch (postback.data) {
-          case 'book':
-            return bookController.book(replyToken);
-          case 'cancelBook':
+          case 'start':
+            return bookController.init_book(replyToken);
+          case 'cancel':
             return bookController.cancelBook(replyToken);
           case 'confirmName':
             // 完成姓名=>進入日期流程
@@ -51,37 +56,46 @@ function execute(replyToken, postback, process) {
           case 'subject':
             bookController.setSubjectStatus_Book(true);
             return bookController.handleSubject(replyToken);
+          case 'check':
+            return bookController.checkIsTimeConflict(replyToken);
           case 'submit':
             return bookController.submitBook(replyToken);
         }
       }
-    case 'COUNT':
-      break;
     case 'MODIFY':
-      // ? 是否為選擇預約List狀態
+      //? 是否為選擇預約List狀態
       if (postback.data.match('^choose[0-9]') && modifyController.getChosenStatus()) {
         const index = postback.data.split('choose').pop();
         return modifyController.choose(replyToken, index);
-      } else if (postback.data.match('^endTime[0-9]')) {
+      }
+      //? 是否為選擇endTime時程狀態
+      else if (postback.data.match('^endTime[0-9]')) {
         const range = postback.data.split('endTime').pop();
         switch (range) {
           case '30':
-            modifyController.setNewEndTime('30分鐘');
+            modifyController.setNewEndTime(range);
             return modifyController.confirmModify(replyToken);
           case '60':
-            modifyController.setNewEndTime('60分鐘');
+            modifyController.setNewEndTime(range);
             return modifyController.confirmModify(replyToken);
           case '90':
-            modifyController.setNewEndTime('90分鐘');
+            modifyController.setNewEndTime(range);
             return modifyController.confirmModify(replyToken);
           case '120':
-            modifyController.setNewEndTime('120分鐘');
+            modifyController.setNewEndTime(range);
             return modifyController.confirmModify(replyToken);
         }
-      } else {
+      }
+      //? 是否選擇其他頁數
+      else if (postback.data.match('^moreModifyPage[0-9]') && modifyController.getChosenStatus()) {
+        const page = postback.data.split('moreModifyPage').pop();
+        return modifyController.moreModifyPage(replyToken, page);
+      }
+      //? 為modify流程中的postback
+      else {
         switch (postback.data) {
-          case 'modify':
-            return modifyController.modify(replyToken);
+          case 'start':
+            return modifyController.init_modify(replyToken);
           case 'cancel':
             return modifyController.cancelModify(replyToken);
           case 'modifyName':
@@ -98,9 +112,67 @@ function execute(replyToken, postback, process) {
             return modifyController.modifyEndTime(replyToken);
           case 'modifySubject':
             return modifyController.modifySubject(replyToken);
-          case 'submitModify':
+          case 'check':
+            return modifyController.checkIsTimeConflict(replyToken);
+          case 'submit':
             return modifyController.submitModify(replyToken);
         }
+      }
+    case 'CANCEL':
+      //? 是否為選擇預約List狀態
+      if (postback.data.match('^choose[0-9]') && cancelController.getChosenStatus()) {
+        const index = postback.data.split('choose').pop();
+        return cancelController.choose(replyToken, index);
+      }
+      //? 是否選擇其他頁
+      else if (postback.data.match('^moreCancelPage[0-9]') && cancelController.getChosenStatus()) {
+        const page = postback.data.split('moreCancelPage').pop();
+        return cancelController.moreCancelPage(replyToken, page);
+      } else {
+        switch (postback.data) {
+          case 'start':
+            return cancelController.init_cancel(replyToken);
+          case 'cancel':
+            return cancelController.cancel(replyToken);
+          case 'change':
+            return cancelController.change(replyToken);
+          case 'submit':
+            return cancelController.submitCancel(replyToken);
+        }
+      }
+    case 'COUNT':
+      if (postback.data.match('^date#\\d{4}-\\d{2}-\\d{2}')) {
+        const date = postback.data.split('date#').pop();
+        return countController.showBooks(replyToken, date);
+      } else {
+        switch (postback.data) {
+          case 'start':
+            return countController.init_count(replyToken);
+          case 'cancel':
+            return countController.cancelCount(replyToken);
+          case 'today':
+            return countController.handleToday(replyToken);
+          case 'currentWeek':
+            return countController.handleCurrentWeek(replyToken);
+          case 'nextWeek':
+            return countController.handleNextWeek(replyToken);
+          case 'change':
+            return countController.change(replyToken);
+          case 'finish':
+            return countController.finish(replyToken);
+        }
+      }
+    case 'SHOW':
+      switch (postback.data) {
+        case 'start':
+          return showController.init_show(replyToken);
+        case 'cancel':
+          return showController.cancelShow(replyToken);
+        case 'searchName':
+          return showController.searchName(replyToken);
+        case 'searchDate':
+          return showController.searchDate(replyToken);
+        case 'finish':
       }
     // 非功能流程中，則跳出此訊息
     default:

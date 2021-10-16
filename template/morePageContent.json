@@ -1,0 +1,69 @@
+modifyListContent.push({
+              type: 'carousel',
+              contents: [
+                {
+                  type: 'bubble',
+                  body: {
+                    type: 'box',
+                    layout: 'vertical',
+                    spacing: 'sm',
+                    contents: [
+                      {
+                        type: 'text',
+                        text: 'See More',
+                        wrap: true,
+                        weight: 'bold',
+                        size: 'xxl',
+                        color: '#87e8de',
+                        align: 'center',
+                      },
+                      {
+                        type: 'text',
+                        text: '總共' + (index + 1) + '幾筆',
+                        wrap: true,
+                        weight: 'bold',
+                        size: 'lg',
+                        flex: 0,
+                        align: 'center',
+                      },
+                      {
+                        type: 'text',
+                        text: '10筆為一頁，請選擇其他頁',
+                        wrap: true,
+                        size: 'xxs',
+                        margin: 'md',
+                        color: '#111111',
+                        flex: 0,
+                        align: 'center',
+                      },
+                    ],
+                  },
+                  footer: {
+                    type: 'box',
+                    layout: 'vertical',
+                    spacing: 'sm',
+                    contents: [
+                      {
+                        type: 'button',
+                        flex: 2,
+                        style: 'primary',
+                        color: '#87e8de',
+                        action: {
+                          type: 'postback',
+                          label: '第'+page+'頁',
+                          data: 'moreModifyPage${page}',
+                        },
+                      },
+                      {
+                        type: 'button',
+                        action: {
+                          type: 'uri',
+                          label: 'Add to wish list',
+                          uri: 'https://linecorp.com',
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            });

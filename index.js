@@ -26,7 +26,7 @@ const app = express();
 const MESSAGE_EVENT = require('./src/event/message.event');
 const POSTBACK_SERVICE = require('./src/event/postback.event');
 const bookController = require('./src/controller/book.controller');
-const PROCESS_MANAGER = require('./src/function/processManager');
+const PROCESS_MANAGER = require('./src/manager/processManager');
 // * PYTHON
 // const spawn = require('child_process').spawn;
 // const pythonProcess = spawn('python', ['./hello.py']);
@@ -76,7 +76,7 @@ function handleEvent(event) {
   console.log('process', process);
   const replyToken = event.replyToken;
   switch (event.type) {
-    // * message event
+    //* message event
     case 'message':
       const message = event.message;
       switch (message.type) {
@@ -95,39 +95,20 @@ function handleEvent(event) {
         default:
           throw new Error(`Unknown message: ${JSON.stringify(message)}`);
       }
-    // * follow event
+    //* follow event
     case 'follow':
       console.log(`Followed this bot: ${JSON.stringify(event)}`);
       return client.replyMessage(replyToken, {
         type: 'text',
         text: 'Got followed event',
       });
-    // * unfollow event
+    //* unfollow event
     case 'unfollow':
       return console.log(`Unfollowed this bot: ${JSON.stringify(event)}`);
-    // * postback event
+    //* postback event
     case 'postback':
       const postback = event.postback;
       return POSTBACK_SERVICE.execute(replyToken, postback, process);
-      switch (postback.data) {
-        case 'book':
-          return POSTBACK_SERVICE.book(replyToken);
-        case 'time':
-          return POSTBACK_SERVICE.time(replyToken, postback);
-        case 'cancel':
-          return POSTBACK_SERVICE.cancel(replyToken);
-        case 'confirmName':
-          return bookController.handleDate(replyToken, true, postback);
-        case 'successDate':
-          console.log('confirm date order', bookController.getOrder());
-          return bookController.handleTime(replyToken, true, postback);
-        case 'modifyName':
-          return POSTBACK_SERVICE.modify(replyToken);
-        case 'modifyName':
-          return POSTBACK_SERVICE.modifyName(replyToken);
-        case 'modifyDate':
-          return POSTBACK_SERVICE.modifyDate(replyToken);
-      }
     //  ${JSON.stringify(event.postback.data)}
     default:
       throw new Error(`Unknown event: ${JSON.stringify(event)}`);

@@ -1,5 +1,15 @@
 /** @format */
 
+const moment = require('moment');
+const line = require('@line/bot-sdk');
+const client = new line.Client({
+  channelAccessToken: process.env['CHANNEL_ACCESS_TOKEN'],
+  channelSecret: process.env['CHANNEL_SECRET'],
+});
+const db = require('../config/config');
+const HELPER = require('../helper/function/commonFunction');
+const PROCESS_MANAGER = require('../manager/processManager');
+
 /** 輸入名字狀態 - search */
 let status = false;
 
@@ -20,7 +30,7 @@ function getStatus() {
 }
 
 /** 設置查詢名字 */
-function setSearchName(name) {
+function setSearchName(data) {
   searchName = name;
 }
 
@@ -30,8 +40,8 @@ function getSearchName() {
 }
 
 /** 設置查找範圍 */
-function setSearchRange(range) {
-  searchRange = range;
+function setSearchRange(data) {
+  searchRange = data;
 }
 
 /** 抓取查找範圍 */

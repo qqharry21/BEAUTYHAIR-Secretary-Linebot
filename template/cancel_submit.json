@@ -1,0 +1,141 @@
+{
+  "type": "bubble",
+  "body": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "text",
+        "text": "請確認欲取消預約內容"
+      },
+      {
+        "type": "box",
+        "layout": "vertical",
+        "margin": "lg",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "baseline",
+            "contents": [
+              {
+                "type": "text",
+                "text": "客戶姓名",
+                "color": "#333333",
+                "size": "sm",
+                "flex": 2,
+                "weight": "bold"
+              },
+              {
+                "type": "text",
+                "text": "陳泉豪",
+                "weight": "bold",
+                "size": "xxl",
+                "color": "#B387DE",
+                "flex": 3,
+                "align": "end"
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "spacing": "sm",
+            "contents": [
+              {
+                "type": "text",
+                "text": "日期 / 時間",
+                "color": "#333333",
+                "size": "sm",
+                "flex": 2,
+                "weight": "bold"
+              },
+              {
+                "type": "text",
+                "text": "2021-10-16 / 下午 08:50",
+                "wrap": true,
+                "size": "md",
+                "flex": 5,
+                "align": "end",
+                "color": "#111111",
+                "weight": "bold"
+              }
+            ]
+          },
+          {
+            "type": "box",
+            "layout": "baseline",
+            "spacing": "sm",
+            "contents": [
+              {
+                "type": "text",
+                "text": "服務時程 / 項目",
+                "color": "#333333",
+                "size": "sm",
+                "flex": 2,
+                "weight": "bold"
+              },
+              {
+                "type": "text",
+                "text": "120分鐘 / 修剪新品",
+                "wrap": true,
+                "color": "#111111",
+                "size": "md",
+                "flex": 3,
+                "align": "end",
+                "weight": "bold"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "separator",
+        "margin": "xl"
+      }
+    ]
+  },
+  "footer": {
+    "type": "box",
+    "layout": "horizontal",
+    "spacing": "sm",
+    "contents": [
+      {
+        "type": "button",
+        "action": {
+          "type": "postback",
+          "label": "更換",
+          "data": "change"
+        },
+        "style": "primary",
+        "height": "sm",
+        "color": "#B387DE"
+      },
+      {
+        "type": "button",
+        "action": {
+          "type": "postback",
+          "label": "取消",
+          "data": "cancel"
+        },
+        "style": "link",
+        "height": "sm",
+        "color": "#B387DE"
+      },
+      {
+        "type": "button",
+        "style": "primary",
+        "height": "sm",
+        "action": {
+          "type": "postback",
+          "label": "確定取消",
+          "data": "modifySubject",
+          "displayText": "更改服務項目"
+        },
+        "color": "#B387DE",
+        "flex": 2
+      }
+    ],
+    "flex": 0
+  }
+}

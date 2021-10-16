@@ -1,0 +1,128 @@
+{
+  "type": "bubble",
+  "body": {
+    "type": "box",
+    "layout": "vertical",
+    "contents": [
+      {
+        "type": "box",
+        "layout": "horizontal",
+        "contents": [
+          {
+            "type": "text",
+            "text": "查詢當週人數",
+            "color": "#4E8FDE",
+            "size": "xxl",
+            "weight": "bold",
+            "flex": 3
+          },
+          {
+            "type": "text",
+            "text": "共10人",
+            "flex": 1,
+            "align": "end",
+            "gravity": "center",
+            "size": "md"
+          }
+        ]
+      },
+      {
+        "type": "text",
+        "text": "點選右邊放大鏡可察看當天預約"
+      },
+      {
+        "type": "box",
+        "layout": "vertical",
+        "margin": "lg",
+        "spacing": "sm",
+        "contents": [
+          {
+            "type": "box",
+            "layout": "baseline",
+            "spacing": "sm",
+            "contents": [
+              {
+                "type": "text",
+                "text": "2021/10/31",
+                "color": "#333333",
+                "size": "lg",
+                "flex": 4,
+                "weight": "bold",
+                "action": {
+                  "type": "postback",
+                  "data": "date",
+                  "displayText": "查看date明細"
+                }
+              },
+              {
+                "type": "text",
+                "wrap": true,
+                "size": "lg",
+                "flex": 1,
+                "align": "end",
+                "color": "#4E8FDE",
+                "weight": "bold",
+                "text": "1",
+                "offsetStart": "20px"
+              },
+              {
+                "type": "text",
+                "text": "人",
+                "flex": 1,
+                "align": "end",
+                "size": "lg"
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "type": "separator",
+        "margin": "xl"
+      }
+    ]
+  },
+  "footer": {
+    "type": "box",
+    "layout": "horizontal",
+    "spacing": "md",
+    "contents": [
+      {
+        "type": "button",
+        "action": {
+          "type": "postback",
+          "label": "更換範圍",
+          "data": "change"
+        },
+        "style": "link",
+        "height": "sm",
+        "color": "#4E8FDE",
+        "flex": 3
+      },
+      {
+        "type": "button",
+        "action": {
+          "type": "postback",
+          "label": "查詢明細",
+          "data": "change"
+        },
+        "style": "link",
+        "height": "sm",
+        "color": "#4E8FDE",
+        "flex": 3
+      },
+      {
+        "type": "button",
+        "style": "primary",
+        "height": "sm",
+        "action": {
+          "type": "postback",
+          "label": "結束",
+          "data": "finish"
+        },
+        "color": "#4E8FDE",
+        "flex": 2
+      }
+    ]
+  }
+}

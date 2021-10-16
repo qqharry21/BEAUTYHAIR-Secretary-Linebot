@@ -21,7 +21,7 @@ const searchController = require('../controller/search.controller');
 const modifyController = require('../controller/modify.controller');
 const cancelController = require('../controller/cancel.controller');
 //* PROCESS
-const PROCESS_MANAGER = require('../function/processManager');
+const PROCESS_MANAGER = require('../manager/processManager');
 
 //* FUNCTION
 /** 處理文字 */
@@ -32,12 +32,20 @@ function handleText(message, replyToken, source, process) {
     switch (process) {
       case 'BOOK':
         // ? 是否為名字輸入狀態
-        if (bookController.getStatus() || bookController.getSubjectStatus_Book()) {
+        if (bookController.getStatus()) {
           // ? 是否符合名字格式
           if (text.match('^b/[\u4e00-\u9fa5a-zA-Z]+$')) {
             console.log('match book');
             return bookController.handleName(replyToken, text.split('b/').pop());
-          } else if (['修剪新品', '洗/染', '剪髮', '返修', '其他'].some(item => item == text)) {
+          } else {
+            bookController.resetOrder();
+            return handleErrorInput(replyToken);
+          }
+        }
+        //? 是否為項目輸入狀態
+        else if (bookController.getSubjectStatus_Book()) {
+          //? 是否符合項目格式
+          if (['修剪新品', '洗/染', '剪髮', '返修', '其他'].some(item => item == text)) {
             bookController.setSubjectStatus_Book(false);
             bookController.setSubject(text);
             return bookController.confirmBook(replyToken);
@@ -70,24 +78,35 @@ function handleText(message, replyToken, source, process) {
           return handleErrorInput(replyToken);
         }
       case 'MODIFY':
-        // ? 是否為名字輸入狀態
-        if (modifyController.getStatus() || modifyController.getSubjectStatus_Modify()) {
-          // ? 是否符合名字格式
+        //? 是否為名字輸入狀態
+        if (modifyController.getStatus()) {
+          //? 是否符合名字格式
           if (text.match('^m/[\u4e00-\u9fa5a-zA-Z]+$')) {
             console.log('match modify');
             return modifyController.handleName(replyToken, text.split('m/').pop());
-          } else if (['修剪新品', '洗/染', '剪髮', '返修', '其他'].some(item => item == text)) {
-            modifyController.setSubjectStatus_Modify(false);
-            modifyController.setNewSubject(text);
-            return modifyController.confirmModify(replyToken);
           } else {
             modifyController.resetNewOrder();
             return handleErrorInput(replyToken);
           }
-        } else if (modifyController.getNameStatus()) {
+        }
+        //? 是否為更改名字輸入狀態
+        else if (modifyController.getNameStatus()) {
+          //? 是否符合更改名字格式
           if (text.match('^b/[\u4e00-\u9fa5a-zA-Z]+$')) {
             console.log('match modifyName');
             return modifyController.handleModifyName(replyToken, text.split('b/').pop());
+          } else {
+            modifyController.resetNewOrder();
+            return handleErrorInput(replyToken);
+          }
+        }
+        //? 是否為更改項目輸入狀態
+        else if (modifyController.getSubjectStatus_Modify()) {
+          //? 是否符合項目格式
+          if (['修剪新品', '洗/染', '剪髮', '返修', '其他'].some(item => item == text)) {
+            modifyController.setSubjectStatus_Modify(false);
+            modifyController.setNewSubject(text);
+            return modifyController.confirmModify(replyToken);
           } else {
             modifyController.resetNewOrder();
             return handleErrorInput(replyToken);
@@ -97,17 +116,18 @@ function handleText(message, replyToken, source, process) {
           return handleErrorInput(replyToken);
         }
       case 'CANCEL':
-        // ? 是否為名字輸入狀態
+        //? 是否為名字輸入狀態
         if (cancelController.getStatus()) {
-          // ? 是否符合名字格式
+          //? 是否符合名字格式
           if (text.match('^c/[\u4e00-\u9fa5a-zA-Z]+$')) {
             console.log('match cancel');
-            // return cancelController.handleName(replyToken, text, status, false);
-            break;
+            return cancelController.handleName(replyToken, text.split('c/').pop());
           } else {
+            cancelController.resetCancelOrder();
             return handleErrorInput(replyToken);
           }
         } else {
+          cancelController.resetCancelOrder();
           return handleErrorInput(replyToken);
         }
     }
