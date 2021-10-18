@@ -163,16 +163,33 @@ function execute(replyToken, postback, process) {
         }
       }
     case 'SHOW':
-      switch (postback.data) {
-        case 'start':
-          return showController.init_show(replyToken);
-        case 'cancel':
-          return showController.cancelShow(replyToken);
-        case 'searchName':
-          return showController.searchName(replyToken);
-        case 'searchDate':
-          return showController.searchDate(replyToken);
-        case 'finish':
+      if (
+        postback.data.match('^choose[\u4e00-\u9fa5a-zA-Z]+$') &&
+        showController.getChosenStatus()
+      ) {
+        const name = postback.data.split('choose').pop();
+        return showController.choose(replyToken, name);
+      } else {
+        switch (postback.data) {
+          case 'start':
+            return showController.init_show(replyToken);
+          case 'cancel':
+            return showController.cancelShow(replyToken);
+          case 'searchName':
+            return showController.searchName(replyToken);
+          case 'searchDate':
+            return showController.searchDate(replyToken);
+          case 'day':
+            return showController.handleDay(replyToken, postback.params.date);
+          case 'startDate':
+            return showController.handleStartDate(replyToken, postback.params.date);
+          case 'endDate':
+            return showController.handleEndDate(replyToken, postback.params.date);
+          case 'search':
+            return showController.searchRange(replyToken, postback.params.date);
+          case 'finish':
+            return showController.finish(replyToken);
+        }
       }
     // 非功能流程中，則跳出此訊息
     default:

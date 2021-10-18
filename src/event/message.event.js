@@ -15,8 +15,8 @@ const MODIFY_SERVICE = require('../service/modify.service');
 const CANCEL_SERVICE = require('../service/cancel.service');
 //* CONTROLLER
 const bookController = require('../controller/book.controller');
-// const countController = require('../controller/count.controller');
-// const showController = require('../controller/show.controller');
+const countController = require('../controller/count.controller');
+const showController = require('../controller/show.controller');
 const searchController = require('../controller/search.controller');
 const modifyController = require('../controller/modify.controller');
 const cancelController = require('../controller/cancel.controller');
@@ -58,9 +58,21 @@ function handleText(message, replyToken, source, process) {
           return handleErrorInput(replyToken);
         }
       case 'COUNT':
-        break;
+        countController.resetCountOrder();
+        return handleErrorInput(replyToken);
       case 'SHOW':
-        break;
+        if (showController.getStatus()) {
+          if (text.match('^s/[\u4e00-\u9fa5a-zA-Z]+$')) {
+            console.log('match show');
+            return showController.handleName(replyToken, text.split('s/').pop());
+          } else {
+            showController.resetShowOrder();
+            return handleErrorInput(replyToken);
+          }
+        } else {
+          showController.resetShowOrder();
+          return handleErrorInput(replyToken);
+        }
       case 'SEARCH':
         // ? 是否為名字輸入狀態
         if (searchController.getStatus()) {
@@ -151,136 +163,8 @@ function handleText(message, replyToken, source, process) {
       case '取消預約':
         return CANCEL_SERVICE.execute(replyToken);
       //* 檢視 show
-      case '檢視預約':
+      case '查詢客戶':
         return SHOW_SERVICE.execute(replyToken);
-      case '檢視':
-        return client.replyMessage(replyToken, {
-          type: 'flex',
-          altText: 'this is a flex message',
-          contents: {
-            type: 'bubble',
-            hero: {
-              type: 'image',
-              url: 'https://scdn.line-apps.com/n/channel_devcenter/img/fx/01_1_cafe.png',
-              size: 'full',
-              aspectRatio: '20:13',
-              aspectMode: 'cover',
-              // action: {
-              //   type: 'uri',
-              //   uri: 'http://linecorp.com/',
-              // },
-            },
-            body: {
-              type: 'box',
-              layout: 'vertical',
-              contents: [
-                {
-                  type: 'text',
-                  text: '陳泉豪',
-                  weight: 'bold',
-                  size: 'xl',
-                },
-                {
-                  type: 'box',
-                  layout: 'vertical',
-                  margin: 'lg',
-                  spacing: 'sm',
-                  contents: [
-                    {
-                      type: 'box',
-                      layout: 'baseline',
-                      spacing: 'sm',
-                      contents: [
-                        {
-                          type: 'text',
-                          text: '時間',
-                          color: '#aaaaaa',
-                          size: 'sm',
-                          flex: 2,
-                        },
-                        {
-                          type: 'text',
-                          text: '10:00 - 23:00',
-                          wrap: true,
-                          color: '#666666',
-                          size: 'sm',
-                          flex: 5,
-                        },
-                      ],
-                    },
-                    {
-                      type: 'box',
-                      layout: 'baseline',
-                      spacing: 'sm',
-                      contents: [
-                        {
-                          type: 'text',
-                          text: '服務內容',
-                          color: '#aaaaaa',
-                          size: 'sm',
-                          flex: 2,
-                        },
-                        {
-                          type: 'text',
-                          text: 'Miraina Tower, 4-1-6 Shinjuku, Tokyo',
-                          wrap: true,
-                          color: '#666666',
-                          size: 'sm',
-                          flex: 5,
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-            footer: {
-              type: 'box',
-              layout: 'horizontal',
-              spacing: 'sm',
-              contents: [
-                {
-                  type: 'button',
-                  style: 'link',
-                  height: 'sm',
-                  action: {
-                    type: 'postback',
-                    label: '確認',
-                    data: 'success',
-                    displayText: '預約成功',
-                  },
-                },
-                {
-                  type: 'button',
-                  style: 'link',
-                  height: 'sm',
-                  action: {
-                    type: 'postback',
-                    label: '更改',
-                    data: 'modify',
-                    displayText: '更改內容',
-                  },
-                },
-                {
-                  type: 'button',
-                  style: 'link',
-                  height: 'sm',
-                  action: {
-                    type: 'postback',
-                    label: '取消',
-                    data: 'cancel',
-                    displayText: '取消預約',
-                  },
-                },
-                {
-                  type: 'spacer',
-                  size: 'sm',
-                },
-              ],
-              flex: 0,
-            },
-          },
-        });
       //* 其他無效指令
       default:
         console.log(`Echo message to ${replyToken}: ${text}`);
