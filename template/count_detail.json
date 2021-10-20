@@ -1,7 +1,4 @@
-{
-  "type": "carousel",
-  "contents": [
-    {
+ {
       "type": "bubble",
       "size": "mega",
       "header": {
@@ -51,7 +48,7 @@
             "contents": [
               {
                 "type": "text",
-                "text": "上午 20:30",
+                "text": "20:30",
                 "size": "sm",
                 "gravity": "center"
               },
@@ -82,7 +79,7 @@
                 "type": "text",
                 "text": "陳泉豪(剪髮) -- 30分鐘",
                 "gravity": "center",
-                "flex": 2,
+                "flex": 5,
                 "size": "sm",
                 "align": "start",
                 "weight": "bold"
@@ -122,7 +119,7 @@
                         "layout": "vertical",
                         "contents": [],
                         "width": "2px",
-                        "backgroundColor": "#EF454D"
+                        "backgroundColor": "#AAAAAA"
                       },
                       {
                         "type": "filler"
@@ -135,62 +132,9 @@
               },
               {
                 "type": "text",
-                "text": "陳雅才(修補新品) -- 30分鐘",
+                "text": " ",
                 "gravity": "center",
-                "flex": 2,
-                "size": "xs",
-                "color": "#8c8c8c"
-              }
-            ],
-            "spacing": "lg",
-            "height": "20px"
-          },
-          {
-            "type": "box",
-            "layout": "horizontal",
-            "contents": [
-              {
-                "type": "box",
-                "layout": "baseline",
-                "contents": [
-                  {
-                    "type": "filler"
-                  }
-                ],
-                "flex": 1
-              },
-              {
-                "type": "box",
-                "layout": "vertical",
-                "contents": [
-                  {
-                    "type": "box",
-                    "layout": "horizontal",
-                    "contents": [
-                      {
-                        "type": "filler"
-                      },
-                      {
-                        "type": "box",
-                        "layout": "vertical",
-                        "contents": [],
-                        "width": "2px",
-                        "backgroundColor": "#EF454D"
-                      },
-                      {
-                        "type": "filler"
-                      }
-                    ],
-                    "flex": 1
-                  }
-                ],
-                "width": "12px"
-              },
-              {
-                "type": "text",
-                "text": "陳泉豪(剪髮) -- 30分鐘",
-                "gravity": "center",
-                "flex": 2,
+                "flex": 5,
                 "size": "xs",
                 "color": "#8c8c8c"
               }
@@ -208,9 +152,10 @@
                 "contents": [
                   {
                     "type": "text",
-                    "text": "上午20:34",
+                    "text": "20:34",
                     "gravity": "center",
-                    "size": "sm"
+                    "size": "sm",
+                    "weight": "bold"
                   }
                 ],
                 "flex": 1
@@ -242,7 +187,7 @@
                 "type": "text",
                 "text": "Ochanomizu",
                 "gravity": "center",
-                "flex": 2,
+                "flex": 5,
                 "size": "sm"
               }
             ],
@@ -293,14 +238,14 @@
               {
                 "type": "text",
                 "gravity": "center",
-                "flex": 2,
+                "flex": 5,
                 "size": "xs",
                 "color": "#8c8c8c",
                 "text": " "
               }
             ],
             "spacing": "lg",
-            "height": "30px"
+            "height": "20px"
           },
           {
             "type": "box",
@@ -308,9 +253,10 @@
             "contents": [
               {
                 "type": "text",
-                "text": "下午18:00",
+                "text": "休息",
                 "gravity": "center",
-                "size": "sm"
+                "size": "sm",
+                "align": "center"
               },
               {
                 "type": "box",
@@ -339,9 +285,113 @@
                 "type": "text",
                 "text": "無預約",
                 "gravity": "center",
-                "flex": 2,
-                "size": "sm",
-                "color": "#AAAAAA"
+                "flex": 5,
+                "size": "sm"
+              }
+            ],
+            "spacing": "lg",
+            "cornerRadius": "30px"
+          },
+          {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+              {
+                "type": "box",
+                "layout": "baseline",
+                "contents": [
+                  {
+                    "type": "filler"
+                  }
+                ],
+                "flex": 1
+              },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "box",
+                    "layout": "horizontal",
+                    "contents": [
+                      {
+                        "type": "filler"
+                      },
+                      {
+                        "type": "box",
+                        "layout": "vertical",
+                        "contents": [],
+                        "width": "2px",
+                        "backgroundColor": "#2AE2F8"
+                      },
+                      {
+                        "type": "filler"
+                      }
+                    ],
+                    "flex": 1
+                  }
+                ],
+                "width": "12px"
+              },
+              {
+                "type": "text",
+                "gravity": "center",
+                "flex": 5,
+                "size": "xs",
+                "color": "#8c8c8c",
+                "text": " "
+              }
+            ],
+            "spacing": "lg",
+            "height": "20px"
+          },
+          {
+            "type": "box",
+            "layout": "horizontal",
+            "contents": [
+              {
+                "type": "box",
+                "layout": "horizontal",
+                "contents": [
+                  {
+                    "type": "text",
+                    "text": "20:34",
+                    "gravity": "center",
+                    "size": "sm",
+                    "weight": "bold"
+                  }
+                ],
+                "flex": 1
+              },
+              {
+                "type": "box",
+                "layout": "vertical",
+                "contents": [
+                  {
+                    "type": "filler"
+                  },
+                  {
+                    "type": "box",
+                    "layout": "vertical",
+                    "contents": [],
+                    "cornerRadius": "30px",
+                    "width": "12px",
+                    "height": "12px",
+                    "borderWidth": "2px",
+                    "borderColor": "#2AE2F8"
+                  },
+                  {
+                    "type": "filler"
+                  }
+                ],
+                "flex": 0
+              },
+              {
+                "type": "text",
+                "text": "Ochanomizu",
+                "gravity": "center",
+                "flex": 5,
+                "size": "sm"
               }
             ],
             "spacing": "lg",
@@ -350,5 +400,4 @@
         ]
       }
     }
-  ]
-}
+  

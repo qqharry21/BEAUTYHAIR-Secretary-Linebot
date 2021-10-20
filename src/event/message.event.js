@@ -74,19 +74,9 @@ function handleText(message, replyToken, source, process) {
           return handleErrorInput(replyToken);
         }
       case 'SEARCH':
-        // ? 是否為名字輸入狀態
         if (searchController.getStatus()) {
-          // ? 是否符合名字格式
-          if (text.match('^s/[\u4e00-\u9fa5a-zA-Z]+$')) {
-            console.log('match search');
-            // return searchController.handleName(replyToken, text, status, false);
-            break;
-          } else {
-            modifyController.resetNewOrder();
-            return handleErrorInput(replyToken);
-          }
         } else {
-          modifyController.resetNewOrder();
+          searchController.resetNewOrder();
           return handleErrorInput(replyToken);
         }
       case 'MODIFY':

@@ -12,7 +12,7 @@ const PROCESS_MANAGER = require('../manager/processManager');
 //* STATUS
 /** 輸入名字狀態 - show */
 let status = false;
-/** 選取預約的狀態 */
+/** 查詢預約的狀態 */
 let chosenStatus = false;
 //* SUM
 let showTotal = 0;
@@ -24,7 +24,7 @@ let showListContent = [];
 //* DATA
 let start_date = '';
 let end_date = '';
-
+let isSame = false;
 function init_show(replyToken) {
   return client.replyMessage(replyToken, {
     type: 'flex',
@@ -1066,124 +1066,24 @@ function choose(replyToken, name) {
 }
 
 function handleDay(replyToken, date) {
-  const sqlSelect = 'SELECT * FROM　`order` WHERE `date` = ? ';
+  const sqlSelect = 'SELECT * FROM `order` WHERE `date` = ? ORDER BY `time`';
   db.query(sqlSelect, [date], (err, result) => {
     if (err) {
+      console.log(err);
       resetShowOrder();
       PROCESS_MANAGER.resetProcess();
       return client.replyMessage(replyToken, { type: 'text', text: '發生錯誤，請通知管理員' });
     } else {
       if (result.length < 1) {
-        return client.replyMessage(replyToken, {
-          type: 'flex',
-          altText: '查詢結果',
-          contents: {
-            type: 'bubble',
-            size: 'mega',
-            header: {
-              type: 'box',
-              layout: 'vertical',
-              contents: [
-                {
-                  type: 'text',
-                  text: '日期',
-                  color: '#FFFFFF',
-                },
-                {
-                  type: 'text',
-                  text: date,
-                  color: '#ffffff',
-                  size: 'xl',
-                  flex: 3,
-                  weight: 'bold',
-                  align: 'start',
-                },
-              ],
-              paddingAll: '20px',
-              backgroundColor: '#9E4751',
-              spacing: 'none',
-              height: '85px',
-              paddingTop: '22px',
-            },
-            body: {
-              type: 'box',
-              layout: 'vertical',
-              contents: [
-                {
-                  type: 'text',
-                  text: `總計：${result.length} 筆`,
-                  color: '#b7b7b7',
-                  size: 'xs',
-                },
-                {
-                  type: 'box',
-                  layout: 'horizontal',
-                  contents: [
-                    {
-                      type: 'text',
-                      text: result[0].time,
-                      size: 'xs',
-                      gravity: 'center',
-                      flex: 1,
-                    },
-                    {
-                      type: 'box',
-                      layout: 'vertical',
-                      contents: [
-                        {
-                          type: 'filler',
-                        },
-                        {
-                          type: 'box',
-                          layout: 'vertical',
-                          contents: [],
-                          cornerRadius: '30px',
-                          height: '12px',
-                          width: '12px',
-                          borderColor: '#9E4751',
-                          borderWidth: '2px',
-                        },
-                        {
-                          type: 'filler',
-                        },
-                      ],
-                      flex: 0,
-                    },
-                    {
-                      type: 'text',
-                      text: `${result[0].name} --${result[0].subject}`,
-                      gravity: 'center',
-                      flex: 5,
-                      size: 'sm',
-                      align: 'start',
-                      weight: 'bold',
-                    },
-                  ],
-                  spacing: 'lg',
-                  cornerRadius: '30px',
-                  margin: 'lg',
-                },
-              ],
-            },
-            footer: {
-              type: 'box',
-              layout: 'vertical',
-              contents: [
-                {
-                  type: 'button',
-                  action: {
-                    type: 'postback',
-                    label: '結束',
-                    data: 'finish',
-                  },
-                  style: 'primary',
-                  color: '#9E4751',
-                },
-              ],
-              spacing: 'xs',
-            },
-          },
-        });
+        return client
+          .replyMessage(replyToken, {
+            type: 'text',
+            text: '當天無預約，請重新點選該功能!',
+          })
+          .then(() => {
+            resetShowOrder();
+            PROCESS_MANAGER.resetProcess();
+          });
       } else {
         showListContent.push({
           type: 'text',
@@ -1192,6 +1092,13 @@ function handleDay(replyToken, date) {
           size: 'xs',
         });
         result.forEach(function (item, index) {
+          if (index != 0) {
+            if (result[index - 1].time == item.time) {
+              isSame = true;
+            } else {
+              isSame = false;
+            }
+          }
           if (index == 0) {
             showListContent.push({
               type: 'box',
@@ -1234,7 +1141,6 @@ function handleDay(replyToken, date) {
                   flex: 5,
                   size: 'sm',
                   align: 'start',
-                  weight: 'bold',
                 },
               ],
               spacing: 'lg',
@@ -1294,14 +1200,14 @@ function handleDay(replyToken, date) {
               spacing: 'lg',
               height: '20px',
             });
-          } else if ((index = result.length - 1)) {
+          } else if (index == result.length - 1) {
             showListContent.push({
               type: 'box',
               layout: 'horizontal',
               contents: [
                 {
                   type: 'text',
-                  text: item.time,
+                  text: isSame ? ' ' : item.time,
                   size: 'sm',
                   gravity: 'center',
                   flex: 1,
@@ -1349,7 +1255,7 @@ function handleDay(replyToken, date) {
               contents: [
                 {
                   type: 'text',
-                  text: item.time,
+                  text: isSame ? ' ' : item.time,
                   size: 'sm',
                   gravity: 'center',
                   flex: 1,
@@ -1558,10 +1464,10 @@ function handleStartDate(replyToken, date) {
               {
                 type: 'text',
                 text: start_date,
-                align: 'end',
+                align: 'center',
                 color: '#9E4751',
                 weight: 'bold',
-                size: 'md',
+                size: 'sm',
               },
               {
                 type: 'text',
@@ -1574,7 +1480,7 @@ function handleStartDate(replyToken, date) {
                 align: 'center',
                 weight: 'bold',
                 color: '#9E4751',
-                size: 'md',
+                size: 'sm',
               },
             ],
             margin: 'lg',
@@ -1661,10 +1567,10 @@ function handleEndDate(replyToken, date) {
               {
                 type: 'text',
                 text: start_date,
-                align: 'end',
+                align: 'center',
                 color: '#9E4751',
                 weight: 'bold',
-                size: 'md',
+                size: 'sm',
               },
               {
                 type: 'text',
@@ -1677,7 +1583,7 @@ function handleEndDate(replyToken, date) {
                 align: 'center',
                 weight: 'bold',
                 color: '#9E4751',
-                size: 'md',
+                size: 'sm',
               },
             ],
             margin: 'lg',
@@ -1710,319 +1616,355 @@ function handleEndDate(replyToken, date) {
 }
 
 function searchRange(replyToken) {
+  resetShowList();
   const sqlSelect =
-    'SELECT * FROM `order` WHERE `date` > ? AND `date` < ? ORDER BY `date` ASC, `time` ASC';
-  db.query(sqlSelect, [start_date, end_date], (err, results) => {
+    'SELECT * FROM `order` WHERE `date` >= ? AND `date` <= ? ORDER BY `date` ASC, `time` ASC';
+  db.query(sqlSelect, [start_date, end_date], (err, result) => {
     if (err) {
       resetShowOrder();
       PROCESS_MANAGER.resetProcess();
       return client.replyMessage(replyToken, [{ type: 'text', text: '發生錯誤，請通知管理員' }]);
     } else {
-      if (result.length < 10) {
-        return client.replyMessage(replyToken, {
-          type: 'flex',
-          altText: '查詢結果',
-          contents: {
-            type: 'bubble',
-            size: 'giga',
-            header: {
-              type: 'box',
-              layout: 'vertical',
-              contents: [
-                {
-                  type: 'text',
-                  text: '查找日期範圍',
-                  color: '#FFFFFF',
-                  offsetStart: '7px',
-                },
-                {
-                  type: 'box',
-                  layout: 'baseline',
-                  contents: [
-                    {
-                      type: 'text',
-                      text: '2021-10-15',
-                      color: '#ffffff',
-                      size: 'lg',
-                      flex: 3,
-                      weight: 'bold',
-                      align: 'center',
-                    },
-                    {
-                      type: 'text',
-                      text: '~',
-                      color: '#ffffff',
-                      size: 'xl',
-                      flex: 1,
-                      weight: 'bold',
-                      align: 'center',
-                    },
-                    {
-                      type: 'text',
-                      text: '2021-10-15',
-                      color: '#ffffff',
-                      size: 'lg',
-                      flex: 3,
-                      weight: 'bold',
-                      align: 'center',
-                    },
-                  ],
-                },
-              ],
-              paddingAll: '20px',
-              backgroundColor: '#9E4751',
-              spacing: 'none',
-              height: '85px',
-              paddingTop: '22px',
-            },
-            body: {
-              type: 'box',
-              layout: 'vertical',
-              contents: [
-                {
-                  type: 'text',
-                  text: '總計：3 筆',
-                  color: '#b7b7b7',
-                  size: 'xs',
-                },
-                {
-                  type: 'box',
-                  layout: 'horizontal',
-                  contents: [
-                    {
-                      type: 'text',
-                      text: '2021-10-15',
-                      size: 'xs',
-                      gravity: 'center',
-                      flex: 1,
-                    },
-                    {
-                      type: 'box',
-                      layout: 'vertical',
-                      contents: [
-                        {
-                          type: 'filler',
-                        },
-                        {
-                          type: 'box',
-                          layout: 'vertical',
-                          contents: [],
-                          cornerRadius: '30px',
-                          height: '12px',
-                          width: '12px',
-                          borderColor: '#9E4751',
-                          borderWidth: '2px',
-                        },
-                        {
-                          type: 'filler',
-                        },
-                      ],
-                      flex: 0,
-                    },
-                    {
-                      type: 'text',
-                      text: '18:30 陳全豪 --修剪新品',
-                      gravity: 'center',
-                      flex: 3,
-                      size: 'sm',
-                      align: 'start',
-                      weight: 'bold',
-                    },
-                  ],
-                  spacing: 'lg',
-                  cornerRadius: '30px',
-                  margin: 'lg',
-                },
-                {
-                  type: 'box',
-                  layout: 'horizontal',
-                  contents: [
-                    {
-                      type: 'box',
-                      layout: 'baseline',
-                      contents: [
-                        {
-                          type: 'filler',
-                        },
-                      ],
-                      flex: 1,
-                    },
-                    {
-                      type: 'box',
-                      layout: 'vertical',
-                      contents: [
-                        {
-                          type: 'box',
-                          layout: 'horizontal',
-                          contents: [
-                            {
-                              type: 'filler',
-                            },
-                            {
-                              type: 'box',
-                              layout: 'vertical',
-                              contents: [],
-                              width: '1.5px',
-                              backgroundColor: '#9E4751',
-                            },
-                            {
-                              type: 'filler',
-                            },
-                          ],
-                          flex: 1,
-                        },
-                      ],
-                      width: '12px',
-                    },
-                    {
-                      type: 'text',
-                      text: ' ',
-                      gravity: 'center',
-                      flex: 3,
-                      size: 'xs',
-                      color: '#8c8c8c',
-                    },
-                  ],
-                  spacing: 'lg',
-                  height: '20px',
-                },
-                {
-                  type: 'box',
-                  layout: 'horizontal',
-                  contents: [
-                    {
-                      type: 'text',
-                      text: '2021-10-15',
-                      size: 'xs',
-                      gravity: 'center',
-                      flex: 1,
-                    },
-                    {
-                      type: 'box',
-                      layout: 'vertical',
-                      contents: [
-                        {
-                          type: 'filler',
-                        },
-                        {
-                          type: 'box',
-                          layout: 'vertical',
-                          contents: [],
-                          cornerRadius: '30px',
-                          height: '12px',
-                          width: '12px',
-                          borderColor: '#9E4751',
-                          borderWidth: '2px',
-                        },
-                        {
-                          type: 'filler',
-                        },
-                      ],
-                      flex: 0,
-                    },
-                    {
-                      type: 'text',
-                      text: '18:30 陳全豪 --修剪新品',
-                      gravity: 'center',
-                      flex: 3,
-                      size: 'sm',
-                      align: 'start',
-                      weight: 'regular',
-                    },
-                  ],
-                  spacing: 'lg',
-                  cornerRadius: '30px',
-                },
-              ],
-            },
-            footer: {
-              type: 'box',
-              layout: 'vertical',
-              contents: [
-                {
-                  type: 'button',
-                  action: {
-                    type: 'postback',
-                    label: '結束',
-                    data: 'finish',
+      showListContent.push({
+        type: 'text',
+        text: `總計：${result.length} 筆`,
+        color: '#b7b7b7',
+        size: 'xs',
+      });
+      result.forEach(function (item, index) {
+        if (index == 0) {
+          showListContent.push({
+            type: 'box',
+            layout: 'horizontal',
+            contents: [
+              {
+                type: 'text',
+                text: item.date.split('-', 2).pop() + '/' + item.date.split('-', 3).pop(),
+                size: 'xs',
+                gravity: 'center',
+                flex: 1,
+              },
+              {
+                type: 'box',
+                layout: 'vertical',
+                contents: [
+                  {
+                    type: 'filler',
                   },
-                  style: 'primary',
-                  color: '#9E4751',
-                },
-              ],
-              spacing: 'xs',
-            },
+                  {
+                    type: 'box',
+                    layout: 'vertical',
+                    contents: [],
+                    cornerRadius: '30px',
+                    height: '12px',
+                    width: '12px',
+                    borderColor: '#9E4751',
+                    borderWidth: '2px',
+                  },
+                  {
+                    type: 'filler',
+                  },
+                ],
+                flex: 0,
+              },
+              {
+                type: 'text',
+                text: `${item.time}  ${item.name} --${item.subject}`,
+                gravity: 'center',
+                flex: 3,
+                size: 'sm',
+                align: 'start',
+              },
+            ],
+            spacing: 'lg',
+            cornerRadius: '30px',
+            margin: 'lg',
+          });
+          showListContent.push({
+            type: 'box',
+            layout: 'horizontal',
+            contents: [
+              {
+                type: 'box',
+                layout: 'baseline',
+                contents: [
+                  {
+                    type: 'filler',
+                  },
+                ],
+                flex: 1,
+              },
+              {
+                type: 'box',
+                layout: 'vertical',
+                contents: [
+                  {
+                    type: 'box',
+                    layout: 'horizontal',
+                    contents: [
+                      {
+                        type: 'filler',
+                      },
+                      {
+                        type: 'box',
+                        layout: 'vertical',
+                        contents: [],
+                        width: '1.5px',
+                        backgroundColor: '#9E4751',
+                      },
+                      {
+                        type: 'filler',
+                      },
+                    ],
+                    flex: 1,
+                  },
+                ],
+                width: '12px',
+              },
+              {
+                type: 'text',
+                text: ' ',
+                gravity: 'center',
+                flex: 3,
+                size: 'xs',
+                color: '#8c8c8c',
+              },
+            ],
+            spacing: 'lg',
+            height: '20px',
+          });
+        } else if (index == result.length - 1) {
+          showListContent.push({
+            type: 'box',
+            layout: 'horizontal',
+            contents: [
+              {
+                type: 'text',
+                text: item.date.split('-', 2).pop() + '/' + item.date.split('-', 3).pop(),
+                size: 'xs',
+                gravity: 'center',
+                flex: 1,
+              },
+              {
+                type: 'box',
+                layout: 'vertical',
+                contents: [
+                  {
+                    type: 'filler',
+                  },
+                  {
+                    type: 'box',
+                    layout: 'vertical',
+                    contents: [],
+                    cornerRadius: '30px',
+                    height: '12px',
+                    width: '12px',
+                    borderColor: '#9E4751',
+                    borderWidth: '2px',
+                  },
+                  {
+                    type: 'filler',
+                  },
+                ],
+                flex: 0,
+              },
+              {
+                type: 'text',
+                text: `${item.time}  ${item.name} --${item.subject}`,
+                gravity: 'center',
+                flex: 3,
+                size: 'sm',
+                align: 'start',
+              },
+            ],
+            spacing: 'lg',
+            cornerRadius: '30px',
+          });
+        } else {
+          showListContent.push({
+            type: 'box',
+            layout: 'horizontal',
+            contents: [
+              {
+                type: 'text',
+                text: item.date.split('-', 2).pop() + '/' + item.date.split('-', 3).pop(),
+                size: 'xs',
+                gravity: 'center',
+                flex: 1,
+              },
+              {
+                type: 'box',
+                layout: 'vertical',
+                contents: [
+                  {
+                    type: 'filler',
+                  },
+                  {
+                    type: 'box',
+                    layout: 'vertical',
+                    contents: [],
+                    cornerRadius: '30px',
+                    height: '12px',
+                    width: '12px',
+                    borderColor: '#9E4751',
+                    borderWidth: '2px',
+                  },
+                  {
+                    type: 'filler',
+                  },
+                ],
+                flex: 0,
+              },
+              {
+                type: 'text',
+                text: `${item.time}  ${item.name} --${item.subject}`,
+                gravity: 'center',
+                flex: 3,
+                size: 'sm',
+                align: 'start',
+              },
+            ],
+            spacing: 'lg',
+            cornerRadius: '30px',
+          });
+          showListContent.push({
+            type: 'box',
+            layout: 'horizontal',
+            contents: [
+              {
+                type: 'box',
+                layout: 'baseline',
+                contents: [
+                  {
+                    type: 'filler',
+                  },
+                ],
+                flex: 1,
+              },
+              {
+                type: 'box',
+                layout: 'vertical',
+                contents: [
+                  {
+                    type: 'box',
+                    layout: 'horizontal',
+                    contents: [
+                      {
+                        type: 'filler',
+                      },
+                      {
+                        type: 'box',
+                        layout: 'vertical',
+                        contents: [],
+                        width: '1.5px',
+                        backgroundColor: '#9E4751',
+                      },
+                      {
+                        type: 'filler',
+                      },
+                    ],
+                    flex: 1,
+                  },
+                ],
+                width: '12px',
+              },
+              {
+                type: 'text',
+                text: ' ',
+                gravity: 'center',
+                flex: 3,
+                size: 'xs',
+                color: '#8c8c8c',
+              },
+            ],
+            spacing: 'lg',
+            height: '20px',
+          });
+        }
+      });
+      return client.replyMessage(replyToken, {
+        type: 'flex',
+        altText: '查詢結果',
+        contents: {
+          type: 'bubble',
+          size: 'giga',
+          header: {
+            type: 'box',
+            layout: 'vertical',
+            contents: [
+              {
+                type: 'text',
+                text: '查找日期範圍',
+                color: '#FFFFFF',
+                offsetStart: '7px',
+              },
+              {
+                type: 'box',
+                layout: 'baseline',
+                contents: [
+                  {
+                    type: 'text',
+                    text: start_date,
+                    color: '#ffffff',
+                    size: 'lg',
+                    flex: 3,
+                    weight: 'bold',
+                    align: 'center',
+                  },
+                  {
+                    type: 'text',
+                    text: '~',
+                    color: '#ffffff',
+                    size: 'xl',
+                    flex: 1,
+                    weight: 'bold',
+                    align: 'center',
+                  },
+                  {
+                    type: 'text',
+                    text: end_date,
+                    color: '#ffffff',
+                    size: 'lg',
+                    flex: 3,
+                    weight: 'bold',
+                    align: 'center',
+                  },
+                ],
+              },
+            ],
+            paddingAll: '20px',
+            backgroundColor: '#9E4751',
+            spacing: 'none',
+            height: '85px',
+            paddingTop: '22px',
           },
-        });
-      }
+          body: {
+            type: 'box',
+            layout: 'vertical',
+            contents: showListContent,
+          },
+          footer: {
+            type: 'box',
+            layout: 'vertical',
+            contents: [
+              {
+                type: 'button',
+                action: {
+                  type: 'postback',
+                  label: '結束',
+                  data: 'finish',
+                },
+                style: 'primary',
+                color: '#9E4751',
+              },
+            ],
+            spacing: 'xs',
+          },
+        },
+      });
     }
   });
 }
-
-// function change(replyToken) {
-//   resetShowOrder();
-//   return client.replyMessage(replyToken, {
-//     type: 'flex',
-//     altText: '日期區間選擇列表',
-//     contents: {
-//       type: 'bubble',
-//       body: {
-//         type: 'box',
-//         layout: 'vertical',
-//         contents: [
-//           {
-//             type: 'text',
-//             text: '請選擇日期區間',
-//           },
-//         ],
-//       },
-//       footer: {
-//         type: 'box',
-//         layout: 'horizontal',
-//         spacing: 'lg',
-//         contents: [
-//           {
-//             type: 'button',
-//             style: 'primary',
-//             height: 'sm',
-//             action: {
-//               type: 'postback',
-//               label: '當天',
-//               data: 'today',
-//               displayText: '當天',
-//             },
-//             color: '#4E8FDE',
-//           },
-//           {
-//             type: 'button',
-//             style: 'primary',
-//             height: 'sm',
-//             action: {
-//               type: 'postback',
-//               label: '當周',
-//               data: 'currentWeek',
-//               displayText: '計算當週',
-//             },
-//             color: '#4E8FDE',
-//           },
-//           {
-//             type: 'button',
-//             style: 'primary',
-//             height: 'sm',
-//             action: {
-//               type: 'postback',
-//               label: '隔周',
-//               data: 'nextWeek',
-//               displayText: '計算隔週',
-//             },
-//             color: '#4E8FDE',
-//           },
-//         ],
-//         flex: 0,
-//       },
-//     },
-//   });
-// }
 
 /** 設置輸入名字流程 */
 function setStatus(process) {
@@ -2050,11 +1992,13 @@ function getChosenStatus() {
  * @description 所有參數回復初始值
  */
 function resetShowOrder() {
-  console.log('reset');
   setStatus(false);
   setChosenStatus(false);
   resetShowList();
   showTotal = 0;
+  start_date = '';
+  end_date = '';
+  isSame = false;
 }
 
 function resetShowList() {
@@ -2089,7 +2033,6 @@ module.exports = {
   handleEndDate,
   handleDay,
   searchRange,
-  // change,
   finish,
   handleName,
 };

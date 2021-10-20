@@ -10,6 +10,7 @@ const modifyController = require('../controller/modify.controller');
 const cancelController = require('../controller/cancel.controller');
 const countController = require('../controller/count.controller');
 const showController = require('../controller/show.controller');
+const searchController = require('../controller/search.controller');
 const PROCESS_MANAGER = require('../manager/processManager');
 
 function execute(replyToken, postback, process) {
@@ -186,11 +187,31 @@ function execute(replyToken, postback, process) {
           case 'endDate':
             return showController.handleEndDate(replyToken, postback.params.date);
           case 'search':
-            return showController.searchRange(replyToken, postback.params.date);
+            return showController.searchRange(replyToken);
           case 'finish':
             return showController.finish(replyToken);
         }
       }
+    case 'SEARCH':
+      switch (postback.data) {
+        case 'start':
+          return searchController.init_search(replyToken);
+        case 'cancel':
+          return searchController.cancelSearch(replyToken);
+        case 'searchDate':
+          return searchController.handleDate(replyToken);
+        case 'startTime':
+          return searchController.handleStartTime(replyToken, postback.params.date);
+        case 'endTime':
+          return searchController.handleEndTime(replyToken, postback.params.date);
+        case 'search':
+          return searchController.search(replyToken);
+        case 'show':
+          return searchController.show(replyToken);
+        case 'finish':
+          return searchController.finish(replyToken);
+      }
+
     // 非功能流程中，則跳出此訊息
     default:
       return client.replyMessage(replyToken, { type: 'text', text: '非功能流程中，無效指令' });

@@ -13,15 +13,15 @@ function execute(replyToken) {
   showController.resetShowOrder();
   return client.replyMessage(replyToken, {
     type: 'template',
-    altText: '查詢條件選單',
+    altText: '查詢預約選單',
     template: {
       type: 'confirm',
-      text: '是否要進入查詢條件流程?',
+      text: '是否要進入查詢預約流程?',
       actions: [
         {
           label: '是',
           type: 'postback',
-          displayText: '我要查詢條件',
+          displayText: '我要查詢預約',
           data: 'start',
         },
         {
