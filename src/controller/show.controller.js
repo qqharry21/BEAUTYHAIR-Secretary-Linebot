@@ -206,7 +206,7 @@ function handleName(replyToken, text) {
             if (res.length == 1) {
               showListContent.push({
                 type: 'text',
-                text: `預約次數：${showTotal}筆`,
+                text: `預約次數：${res.length}筆`,
                 color: '#b7b7b7',
                 size: 'xs',
               });

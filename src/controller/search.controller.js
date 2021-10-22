@@ -68,7 +68,7 @@ function cancelSearch(replyToken) {
   PROCESS_MANAGER.resetProcess();
   return client.replyMessage(replyToken, {
     type: 'text',
-    text: '結束-查詢是否有預約流程',
+    text: '結束-查詢時段流程',
   });
 }
 
