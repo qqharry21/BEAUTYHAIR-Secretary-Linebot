@@ -173,6 +173,7 @@ function searchDate(replyToken) {
 function handleName(replyToken, text) {
   setStatus(false);
   if (text.length > 1) {
+    text = HELPER.searchAll(text);
     const sqlSelect = 'SELECT DISTINCT `name` FROM `order` WHERE `name` LIKE CONCAT("%", ?, "%")';
 
     query(sqlSelect, [text], (err, result) => {
@@ -1416,6 +1417,7 @@ function handleDay(replyToken, date) {
     }
   });
 }
+
 function handleStartDate(replyToken, date) {
   start_date = date;
   return client.replyMessage(replyToken, {
@@ -1519,6 +1521,7 @@ function handleStartDate(replyToken, date) {
     },
   });
 }
+
 function handleEndDate(replyToken, date) {
   end_date = date;
   return client.replyMessage(replyToken, {
@@ -1951,8 +1954,18 @@ function searchRange(replyToken) {
           },
           footer: {
             type: 'box',
-            layout: 'vertical',
+            layout: 'horizontal',
             contents: [
+              {
+                type: 'button',
+                action: {
+                  type: 'postback',
+                  label: '繼續查詢',
+                  data: 'continue',
+                },
+                style: 'link',
+                color: '#9E4751',
+              },
               {
                 type: 'button',
                 action: {
@@ -1970,28 +1983,6 @@ function searchRange(replyToken) {
       });
     }
   });
-}
-
-/** 設置輸入名字流程 */
-function setStatus(process) {
-  status = process;
-}
-
-function getStatus() {
-  return status;
-}
-
-/** 設置選擇欲更改預約的狀態
- * @true 已抓取List
- * @false 抓取List發生錯誤
- */
-function setChosenStatus(process) {
-  chosenStatus = process;
-}
-
-/** 抓取選擇欲更改預約的狀態 */
-function getChosenStatus() {
-  return chosenStatus;
 }
 
 /** 清空資料
@@ -2021,6 +2012,28 @@ function finish(replyToken) {
     type: 'text',
     text: '結束-查詢條件流程',
   });
+}
+
+/** 設置輸入名字流程 */
+function setStatus(process) {
+  status = process;
+}
+
+function getStatus() {
+  return status;
+}
+
+/** 設置選擇欲更改預約的狀態
+ * @true 已抓取List
+ * @false 抓取List發生錯誤
+ */
+function setChosenStatus(process) {
+  chosenStatus = process;
+}
+
+/** 抓取選擇欲更改預約的狀態 */
+function getChosenStatus() {
+  return chosenStatus;
 }
 
 module.exports = {

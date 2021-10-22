@@ -189,6 +189,8 @@ function execute(replyToken, postback, process) {
             return showController.searchRange(replyToken);
           case 'finish':
             return showController.finish(replyToken);
+          case 'continue':
+            return showController.init_show(replyToken);
         }
       }
     case 'SEARCH':

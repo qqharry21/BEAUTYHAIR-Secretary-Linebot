@@ -61,4 +61,13 @@ function diffTime(date, time) {
   return Math.abs(moment().diff(Date.parse(dateTime).valueOf(), 'minutes'));
 }
 
-module.exports = { timeChange, leftPad, addEndTimeToDateTime, diffTime };
+function searchAll(text) {
+  if (text.match('[\u4e00-\u9fa5a-zA-Z][*]')) {
+    text = text.split('*').shift();
+  } else if (text.match('[*][\u4e00-\u9fa5a-zA-Z]')) {
+    text = text.split('*').pop();
+  }
+  return text;
+}
+
+module.exports = { timeChange, leftPad, addEndTimeToDateTime, diffTime, searchAll };
