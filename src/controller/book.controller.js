@@ -6,7 +6,7 @@ const client = new line.Client({
   channelAccessToken: process.env['CHANNEL_ACCESS_TOKEN'],
   channelSecret: process.env['CHANNEL_SECRET'],
 });
-const db = require('../config/config');
+const query = require('../config/config');
 const HELPER = require('../helper/commonFunction');
 const PROCESS_MANAGER = require('../manager/processManager');
 
@@ -543,7 +543,7 @@ function confirmBook(replyToken) {
 function submitBook(replyToken) {
   const sqlSelect =
     'INSERT INTO `order` (`name`, `date`, `time`, `endTime`, `subject`) VALUES (?, ?, ?, ?, ?)';
-  db.query(sqlSelect, [name, date, time, endTime, subject], (err, result) => {
+  query(sqlSelect, [name, date, time, endTime, subject], (err, result) => {
     if (err) {
       resetOrder();
       PROCESS_MANAGER.resetProcess();
@@ -747,7 +747,7 @@ function submitBook(replyToken) {
 
 function checkIsTimeConflict(replyToken) {
   const sqlSelect = 'SELECT * FROM `order` WHERE `date`= ? AND `time` LIKE CONCAT( ?, "%")';
-  db.query(sqlSelect, [date, time], (err, result) => {
+  query(sqlSelect, [date, time], (err, result) => {
     if (result.length > 0) {
       return client.replyMessage(replyToken, {
         type: 'template',

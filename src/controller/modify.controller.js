@@ -6,7 +6,7 @@ const client = new line.Client({
   channelAccessToken: process.env['CHANNEL_ACCESS_TOKEN'],
   channelSecret: process.env['CHANNEL_SECRET'],
 });
-const db = require('../config/config');
+const query = require('../config/config');
 const HELPER = require('../helper/commonFunction');
 const PROCESS_MANAGER = require('../manager/processManager');
 //* STATUS
@@ -87,7 +87,7 @@ function handleName(replyToken, text) {
   if (text.length > 1) {
     const sqlSelect =
       'SELECT `id`, `name`, `date`, `time`, `endTime`, `subject` FROM `order` WHERE `name` LIKE CONCAT("%", ?, "%") AND `date` > NOW() ORDER BY ABS( DATEDIFF( `date`, NOW() ) ) ,`create_time` DESC';
-    db.query(sqlSelect, [text], (err, result) => {
+    query(sqlSelect, [text], (err, result) => {
       //? 是否有抓到相符資料
       if (result.length > 0) {
         //? 是否小於等於10筆
@@ -1376,7 +1376,7 @@ function confirmModify(replyToken) {
 function submitModify(replyToken) {
   const sqlSelect =
     'UPDATE `order` SET `name` = ? , `date` = ? , `time` = ? , `endTime` = ? , `subject` = ? WHERE `id` = ?';
-  db.query(
+  query(
     sqlSelect,
     [
       newOrder.newName,
@@ -1590,7 +1590,7 @@ function submitModify(replyToken) {
 /** 檢查是否有同時段客戶 */
 function checkIsTimeConflict(replyToken) {
   const sqlSelect = 'SELECT * FROM `order` WHERE `date`= ? AND `time` LIKE CONCAT( ?, "%")';
-  db.query(sqlSelect, [getNewDate(), getNewTime()], (err, result) => {
+  query(sqlSelect, [getNewDate(), getNewTime()], (err, result) => {
     if (result.length > 0) {
       return client.replyMessage(replyToken, {
         type: 'template',

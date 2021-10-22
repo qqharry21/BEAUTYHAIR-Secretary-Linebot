@@ -6,7 +6,7 @@ const client = new line.Client({
   channelAccessToken: process.env['CHANNEL_ACCESS_TOKEN'],
   channelSecret: process.env['CHANNEL_SECRET'],
 });
-const db = require('../config/config');
+const query = require('../config/config');
 const HELPER = require('../helper/commonFunction');
 const PROCESS_MANAGER = require('../manager/processManager');
 
@@ -97,7 +97,7 @@ function cancelCount(replyToken) {
 function handleToday(replyToken) {
   resetCountOrder();
   const sqlSelect = 'SELECT * FROM `order` WHERE `date` = ? ORDER BY `time` ASC, `endTime` ASC';
-  db.query(sqlSelect, [moment().format('YYYY-MM-DD')], (err, result) => {
+  query(sqlSelect, [moment().format('YYYY-MM-DD')], (err, result) => {
     if (err) {
       console.log('err', err);
       resetCountOrder();
@@ -817,7 +817,7 @@ function handleCurrentWeek(replyToken) {
   resetCountOrder();
   const sqlSelect =
     'SELECT `date`, count(1) AS count FROM `order` WHERE `date` > date_format(?, "%Y-%m-%d") AND `date` < date_format(?, "%Y-%m-%d") GROUP BY year(`date`), month(`date`), day(`date`) ORDER BY year(`date`) ASC, month(`date`) ASC, day(`date`) ASC;';
-  db.query(
+  query(
     sqlSelect,
     [
       moment().startOf('isoWeek').format('YYYY-MM-DD'),
@@ -973,7 +973,7 @@ function handleNextWeek(replyToken) {
   resetCountOrder();
   const sqlSelect =
     'SELECT `date`, count(1) AS count FROM `order` WHERE `date` > date_format(?, "%Y-%m-%d") AND `date` < date_format(?, "%Y-%m-%d") GROUP BY year(`date`), month(`date`), day(`date`) ORDER BY year(`date`) ASC, month(`date`) ASC, day(`date`) ASC;';
-  db.query(
+  query(
     sqlSelect,
     [
       moment().startOf('isoWeek').add(7, 'days').format('YYYY-MM-DD'),
@@ -1192,7 +1192,7 @@ function change(replyToken) {
 
 function showBooks(replyToken, date) {
   const sqlSelect = 'SELECT * FROM `order` WHERE `date` = ? ORDER BY `time` ASC, `endTime` ASC';
-  db.query(sqlSelect, [date], (err, result) => {
+  query(sqlSelect, [date], (err, result) => {
     if (err) {
       console.log('err', err);
       resetCountOrder();

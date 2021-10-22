@@ -6,7 +6,7 @@ const client = new line.Client({
   channelAccessToken: process.env['CHANNEL_ACCESS_TOKEN'],
   channelSecret: process.env['CHANNEL_SECRET'],
 });
-const db = require('../config/config');
+const query = require('../config/config');
 const HELPER = require('../helper/commonFunction');
 const PROCESS_MANAGER = require('../manager/processManager');
 //* STATUS
@@ -169,7 +169,7 @@ function handleName(replyToken, text) {
   if (text.length > 1) {
     const sqlSelect = 'SELECT DISTINCT `name` FROM `order` WHERE `name` LIKE CONCAT("%", ?, "%")';
 
-    db.query(sqlSelect, [text], (err, result) => {
+    query(sqlSelect, [text], (err, result) => {
       if (err) {
         resetShowOrder();
         PROCESS_MANAGER.resetProcess();
@@ -188,7 +188,7 @@ function handleName(replyToken, text) {
         //只找到一個客戶
         const sqlSelect2 =
           'SELECT `date`, `time`, `subject` FROM `order` WHERE `name` = ? ORDER BY `date` ASC, `time` ASC';
-        db.query(sqlSelect2, [result[0].name], (error, res) => {
+        query(sqlSelect2, [result[0].name], (error, res) => {
           if (error) {
             resetShowOrder();
             PROCESS_MANAGER.resetProcess();
@@ -673,7 +673,7 @@ function choose(replyToken, name) {
   setChosenStatus(false);
   const sqlSelect =
     'SELECT `date`, `time`, `subject` FROM `order` WHERE `name` = ? ORDER BY `date` ASC, `time` ASC';
-  db.query(sqlSelect, [name], (err, result) => {
+  query(sqlSelect, [name], (err, result) => {
     if (err) {
       resetShowOrder();
       PROCESS_MANAGER.resetProcess();
@@ -1067,7 +1067,7 @@ function choose(replyToken, name) {
 
 function handleDay(replyToken, date) {
   const sqlSelect = 'SELECT * FROM `order` WHERE `date` = ? ORDER BY `time`';
-  db.query(sqlSelect, [date], (err, result) => {
+  query(sqlSelect, [date], (err, result) => {
     if (err) {
       console.log(err);
       resetShowOrder();
@@ -1619,7 +1619,7 @@ function searchRange(replyToken) {
   resetShowList();
   const sqlSelect =
     'SELECT * FROM `order` WHERE `date` >= ? AND `date` <= ? ORDER BY `date` ASC, `time` ASC';
-  db.query(sqlSelect, [start_date, end_date], (err, result) => {
+  query(sqlSelect, [start_date, end_date], (err, result) => {
     if (err) {
       resetShowOrder();
       PROCESS_MANAGER.resetProcess();

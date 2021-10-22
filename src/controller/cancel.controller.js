@@ -5,7 +5,7 @@ const client = new line.Client({
   channelAccessToken: process.env['CHANNEL_ACCESS_TOKEN'],
   channelSecret: process.env['CHANNEL_SECRET'],
 });
-const db = require('../config/config');
+const query = require('../config/config');
 const HELPER = require('../helper/commonFunction');
 const PROCESS_MANAGER = require('../manager/processManager');
 
@@ -63,7 +63,7 @@ function handleName(replyToken, text) {
   if (text.length > 1) {
     const sqlSelect =
       'SELECT `id`, `name`, `date`, `time`, `endTime`, `subject` FROM `order` WHERE `name` LIKE CONCAT(?, "%") AND `date` > NOW() ORDER BY ABS( DATEDIFF( `date`, NOW() ) ) ,`create_time` DESC';
-    db.query(sqlSelect, [text], (err, result) => {
+    query(sqlSelect, [text], (err, result) => {
       //? 是否有抓到相符資料
       if (result.length > 0) {
         //? 是否小於等於10筆
@@ -926,7 +926,7 @@ function change(replyToken) {
 /** 確認取消*/
 function submitCancel(replyToken) {
   const sqlSelect = 'DELETE FROM `order` WHERE `id` = ?';
-  db.query(sqlSelect, [cancelOrder.cid], (err, result) => {
+  query(sqlSelect, [cancelOrder.cid], (err, result) => {
     if (err) {
       resetCancelOrder();
       PROCESS_MANAGER.resetProcess();

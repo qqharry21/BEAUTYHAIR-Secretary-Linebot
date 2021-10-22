@@ -6,7 +6,7 @@ const client = new line.Client({
   channelAccessToken: process.env['CHANNEL_ACCESS_TOKEN'],
   channelSecret: process.env['CHANNEL_SECRET'],
 });
-const db = require('../config/config');
+const query = require('../config/config');
 const PROCESS_MANAGER = require('../manager/processManager');
 //* LIST
 /** 相關預約List */
@@ -420,7 +420,7 @@ function handleEndTime(replyToken, time) {
 function search(replyToken) {
   const sqlSelect =
     'SELECT * FROM `order` WHERE `date` = ? and `time` >= ? and `time` <= ? ORDER BY `time`';
-  db.query(sqlSelect, [searchDate, start_time, end_time], (err, result) => {
+  query(sqlSelect, [searchDate, start_time, end_time], (err, result) => {
     if (err) {
       console.log(err);
       resetSearchOrder();
