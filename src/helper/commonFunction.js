@@ -14,6 +14,7 @@ function timeChange(time) {
   }
   return output;
 }
+
 function addEndTimeToDateTime(date, time, endTime) {
   let hour = parseInt(time.split(':', 1).shift());
   let minute = parseInt(time.split(':').pop());
@@ -34,6 +35,7 @@ function addEndTimeToDateTime(date, time, endTime) {
   let dateTime = date + ' ' + leftPad(hour, 2, 0) + ':' + leftPad(minute, 2, 0);
   return dateTime;
 }
+
 /** 字串整理(編號左邊補0) */
 function leftPad(str, len, ch) {
   str = str + '';

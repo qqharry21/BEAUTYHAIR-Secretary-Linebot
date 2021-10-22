@@ -1,8 +1,7 @@
 /** @format */
 
 'use strict';
-const https = require('https');
-const fs = require('fs');
+// const https = require('https');
 const line = require('@line/bot-sdk');
 const express = require('express');
 const dotenv = require('dotenv');
@@ -89,7 +88,7 @@ function handleEvent(event) {
         case 'location':
           return MESSAGE_EVENT.handleLocation(message, replyToken, event.source);
         case 'sticker':
-          return handleSticker(message, replyToken);
+          return MESSAGE_EVENT.handleSticker(message, replyToken);
         default:
           throw new Error(`Unknown message: ${JSON.stringify(message)}`);
       }

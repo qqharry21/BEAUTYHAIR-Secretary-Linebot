@@ -6,6 +6,8 @@ const client = new line.Client({
   channelAccessToken: process.env['CHANNEL_ACCESS_TOKEN'],
   channelSecret: process.env['CHANNEL_SECRET'],
 });
+const fs = require('fs');
+const path = require('path');
 //* SERVICE
 const BOOK_SERVICE = require('../service/book.service');
 const COUNT_SERVICE = require('../service/count.service');
@@ -22,7 +24,6 @@ const modifyController = require('../controller/modify.controller');
 const cancelController = require('../controller/cancel.controller');
 //* PROCESS
 const PROCESS_MANAGER = require('../manager/processManager');
-
 //* FUNCTION
 /** 處理文字 */
 function handleText(message, replyToken, source, process) {
@@ -175,13 +176,19 @@ function handleErrorInput(replyToken) {
 function handleImage(message, replyToken) {
   let getContent;
   console.log('image message', message);
+  PROCESS_MANAGER.resetProcess();
   if (message.contentProvider.type === 'line') {
-    const downloadPath = path.join(process.cwd(), 'public', 'downloaded', `${message.id}.jpg`);
-
+    const downloadPath = path.join(process.cwd(), 'public', 'download', `${message.id}.jpg`);
     getContent = downloadContent(message.id, downloadPath).then(downloadPath => {
       return {
-        originalContentUrl: baseURL + '/downloaded/' + path.basename(downloadPath),
-        previewImageUrl: baseURL + '/downloaded/' + path.basename(downloadPath),
+        originalContentUrl:
+          'https://d3d2-2001-b400-e274-2de4-c99a-3678-f2a-41d4.ngrok.io' +
+          '/download/' +
+          path.basename(downloadPath),
+        previewImageUrl:
+          'https://d3d2-2001-b400-e274-2de4-c99a-3678-f2a-41d4.ngrok.io' +
+          '/download/' +
+          path.basename(downloadPath),
       };
     });
   } else if (message.contentProvider.type === 'external') {
@@ -199,12 +206,16 @@ function handleImage(message, replyToken) {
 
 function handleVideo(message, replyToken) {
   let getContent;
+  PROCESS_MANAGER.resetProcess();
   if (message.contentProvider.type === 'line') {
     const downloadPath = path.join(process.cwd(), 'public', 'downloaded', `${message.id}.mp4`);
 
     getContent = downloadContent(message.id, downloadPath).then(downloadPath => {
       return {
-        originalContentUrl: baseURL + '/downloaded/' + path.basename(downloadPath),
+        originalContentUrl:
+          'https://d3d2-2001-b400-e274-2de4-c99a-3678-f2a-41d4.ngrok.io' +
+          '/downloaded/' +
+          path.basename(downloadPath),
         previewImageUrl: lineImgURL,
       };
     });
@@ -223,12 +234,16 @@ function handleVideo(message, replyToken) {
 
 function handleAudio(message, replyToken) {
   let getContent;
+  PROCESS_MANAGER.resetProcess();
   if (message.contentProvider.type === 'line') {
     const downloadPath = path.join(process.cwd(), 'public', 'downloaded', `${message.id}.m4a`);
 
     getContent = downloadContent(message.id, downloadPath).then(downloadPath => {
       return {
-        originalContentUrl: baseURL + '/downloaded/' + path.basename(downloadPath),
+        originalContentUrl:
+          'https://d3d2-2001-b400-e274-2de4-c99a-3678-f2a-41d4.ngrok.io' +
+          '/downloaded/' +
+          path.basename(downloadPath),
       };
     });
   } else {
@@ -245,6 +260,7 @@ function handleAudio(message, replyToken) {
 }
 
 function handleLocation(message, replyToken) {
+  PROCESS_MANAGER.resetProcess();
   return client.replyMessage(replyToken, {
     type: 'location',
     title: message.title,
@@ -255,13 +271,30 @@ function handleLocation(message, replyToken) {
 }
 
 function handleSticker(message, replyToken) {
-  return client.replyMessage(replyToken, {
-    type: 'sticker',
-    packageId: message.packageId,
-    stickerId: message.stickerId,
-  });
+  if (message.stickerResourceType == 'STATIC') {
+    PROCESS_MANAGER.resetProcess();
+    return client.replyMessage(replyToken, {
+      type: 'sticker',
+      packageId: message.packageId,
+      stickerId: message.stickerId,
+    });
+  } else {
+    handleErrorInput(replyToken);
+  }
 }
 
+//參考至https://ithelp.ithome.com.tw/articles/10219503
+function downloadContent(messageId, downloadPath) {
+  return client.getMessageContent(messageId).then(
+    stream =>
+      new Promise((resolve, reject) => {
+        const writable = fs.createWriteStream(downloadPath);
+        stream.pipe(writable);
+        stream.on('end', () => resolve(downloadPath));
+        stream.on('error', reject);
+      })
+  );
+}
 module.exports = {
   handleText,
   handleImage,

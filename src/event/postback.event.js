@@ -11,7 +11,6 @@ const cancelController = require('../controller/cancel.controller');
 const countController = require('../controller/count.controller');
 const showController = require('../controller/show.controller');
 const searchController = require('../controller/search.controller');
-const PROCESS_MANAGER = require('../manager/processManager');
 
 function execute(replyToken, postback, process) {
   // 判斷是否為功能流程中
@@ -211,7 +210,6 @@ function execute(replyToken, postback, process) {
         case 'finish':
           return searchController.finish(replyToken);
       }
-
     // 非功能流程中，則跳出此訊息
     default:
       return client.replyMessage(replyToken, { type: 'text', text: '非功能流程中，無效指令' });
