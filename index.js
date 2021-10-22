@@ -25,7 +25,6 @@ const client = new line.Client(config);
 const app = express();
 const MESSAGE_EVENT = require('./src/event/message.event');
 const POSTBACK_SERVICE = require('./src/event/postback.event');
-const bookController = require('./src/controller/book.controller');
 const PROCESS_MANAGER = require('./src/manager/processManager');
 // * PYTHON
 // const spawn = require('child_process').spawn;
@@ -36,12 +35,16 @@ const PROCESS_MANAGER = require('./src/manager/processManager');
 
 // const richMenu = require('./richMenu');
 // * post rich menu
-// client.createRichMenu(richMenu)
-//     .then((richMenuId) => console.log(richMenuId))
-//     .catch(err => console.error(err))
+// client
+//   .createRichMenu(richMenu)
+//   .then(richMenuId => console.log(richMenuId))
+//   .catch(err => console.error(err));
 // * post rich menu image
 // client
-//   .setRichMenuImage(process.env.RICHMENU_ID, fs.createReadStream('./public/richMenu.png'))
+//   .setRichMenuImage(
+//     'richmenu-b3d135dab7fb8d8f840e733c182d195c',
+//     fs.createReadStream('./public/richMenu.png')
+//   )
 //   .then(res => console.log(res))
 //   .catch(err => console.error(err));
 
@@ -67,11 +70,6 @@ app.post('/callback', line.middleware(config), (req, res) => {
 
 /** 處理 all event */
 function handleEvent(event) {
-  // console.log('event', event);
-  // if (event.type !== 'message' || event.message.type !== 'text') {
-  //   // ignore non-text-message event
-  //   return Promise.resolve(null);
-  // }
   const process = PROCESS_MANAGER.getProcess();
   console.log('process', process);
   const replyToken = event.replyToken;
@@ -109,7 +107,6 @@ function handleEvent(event) {
     case 'postback':
       const postback = event.postback;
       return POSTBACK_SERVICE.execute(replyToken, postback, process);
-    //  ${JSON.stringify(event.postback.data)}
     default:
       throw new Error(`Unknown event: ${JSON.stringify(event)}`);
   }

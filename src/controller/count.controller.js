@@ -7,7 +7,7 @@ const client = new line.Client({
   channelSecret: process.env['CHANNEL_SECRET'],
 });
 const db = require('../config/config');
-const HELPER = require('../helper/function/commonFunction');
+const HELPER = require('../helper/commonFunction');
 const PROCESS_MANAGER = require('../manager/processManager');
 
 //* sum

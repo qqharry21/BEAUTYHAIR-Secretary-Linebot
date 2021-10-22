@@ -13,15 +13,15 @@ function execute(replyToken) {
   searchController.resetSearchOrder();
   return client.replyMessage(replyToken, {
     type: 'template',
-    altText: '查詢是否有無預約選單',
+    altText: '查詢時段選單',
     template: {
       type: 'confirm',
-      text: '是否要進入查詢有無預約流程?',
+      text: '是否要進入查詢時段流程?',
       actions: [
         {
           label: '是',
           type: 'postback',
-          displayText: '我要查詢是否有無預約',
+          displayText: '我要查詢時段',
           data: 'start',
         },
         {

@@ -7,7 +7,6 @@ const client = new line.Client({
   channelSecret: process.env['CHANNEL_SECRET'],
 });
 const db = require('../config/config');
-const HELPER = require('../helper/function/commonFunction');
 const PROCESS_MANAGER = require('../manager/processManager');
 //* LIST
 /** 相關預約List */
@@ -62,6 +61,7 @@ function init_search(replyToken) {
     },
   });
 }
+
 function cancelSearch(replyToken) {
   resetSearchOrder();
   // 結束流程
@@ -71,6 +71,7 @@ function cancelSearch(replyToken) {
     text: '結束-查詢是否有預約流程',
   });
 }
+
 function handleDate(replyToken, date) {
   searchDate = date;
   return client.replyMessage(replyToken, {
@@ -108,13 +109,6 @@ function handleDate(replyToken, date) {
         layout: 'vertical',
         contents: [
           {
-            type: 'text',
-            text: '請選擇起始時間',
-            size: 'md',
-            align: 'start',
-            color: '#AAAAAA',
-          },
-          {
             type: 'box',
             layout: 'horizontal',
             contents: [
@@ -143,7 +137,7 @@ function handleDate(replyToken, date) {
             contents: [
               {
                 type: 'text',
-                text: ' ',
+                text: '未填寫',
                 align: 'center',
                 color: '#111111',
                 weight: 'bold',
@@ -156,7 +150,7 @@ function handleDate(replyToken, date) {
               },
               {
                 type: 'text',
-                text: ' ',
+                text: '未填寫',
                 align: 'center',
                 weight: 'bold',
                 color: '#111111',
@@ -174,8 +168,10 @@ function handleDate(replyToken, date) {
           {
             type: 'button',
             action: {
-              type: 'postback',
               label: '選擇起始時間',
+              type: 'datetimepicker',
+              mode: 'time',
+              initial: '10:00',
               data: 'startTime',
             },
             style: 'primary',
@@ -229,13 +225,6 @@ function handleStartTime(replyToken, time) {
         layout: 'vertical',
         contents: [
           {
-            type: 'text',
-            text: '請選擇結束時間',
-            size: 'md',
-            align: 'start',
-            color: '#AAAAAA',
-          },
-          {
             type: 'box',
             layout: 'horizontal',
             contents: [
@@ -277,7 +266,7 @@ function handleStartTime(replyToken, time) {
               },
               {
                 type: 'text',
-                text: ' ',
+                text: '未填寫',
                 align: 'center',
                 weight: 'bold',
                 color: '#111111',
@@ -295,8 +284,10 @@ function handleStartTime(replyToken, time) {
           {
             type: 'button',
             action: {
-              type: 'postback',
               label: '選擇結束時間',
+              type: 'datetimepicker',
+              mode: 'time',
+              initial: '18:00',
               data: 'endTime',
             },
             style: 'primary',
@@ -312,6 +303,7 @@ function handleStartTime(replyToken, time) {
     },
   });
 }
+
 function handleEndTime(replyToken, time) {
   end_time = time;
   return client.replyMessage(replyToken, {
@@ -348,13 +340,6 @@ function handleEndTime(replyToken, time) {
         type: 'box',
         layout: 'vertical',
         contents: [
-          {
-            type: 'text',
-            text: '請確認查詢範圍',
-            size: 'md',
-            align: 'start',
-            color: '#AAAAAA',
-          },
           {
             type: 'box',
             layout: 'horizontal',
@@ -435,7 +420,7 @@ function handleEndTime(replyToken, time) {
 function search(replyToken) {
   const sqlSelect =
     'SELECT * FROM `order` WHERE `date` = ? and `time` >= ? and `time` <= ? ORDER BY `time`';
-  db.query(sqlSelect, [date, start_time, end_time], (err, result) => {
+  db.query(sqlSelect, [searchDate, start_time, end_time], (err, result) => {
     if (err) {
       console.log(err);
       resetSearchOrder();
@@ -446,7 +431,7 @@ function search(replyToken) {
         return client
           .replyMessage(replyToken, {
             type: 'text',
-            text: '當天無預約，請重新點選該功能!',
+            text: '目前無預約，請重新點選該功能!',
           })
           .then(() => {
             resetSearchOrder();
@@ -471,7 +456,7 @@ function search(replyToken) {
                 },
                 {
                   type: 'text',
-                  text: '2021-10-15',
+                  text: searchDate,
                   color: '#ffffff',
                   size: 'xl',
                   flex: 3,
@@ -533,17 +518,478 @@ function search(replyToken) {
   });
 }
 function show(replyToken) {
-  if (showList.length == 1) {
+  if (searchList.length == 1) {
+    searchListContent.push({
+      type: 'box',
+      layout: 'horizontal',
+      contents: [
+        {
+          type: 'text',
+          text: `${searchList[0].time}`,
+          size: 'xs',
+          gravity: 'center',
+          flex: 1,
+        },
+        {
+          type: 'box',
+          layout: 'vertical',
+          contents: [
+            {
+              type: 'filler',
+            },
+            {
+              type: 'box',
+              layout: 'vertical',
+              contents: [],
+              cornerRadius: '30px',
+              height: '12px',
+              width: '12px',
+              borderColor: '#AAAAAA',
+              borderWidth: '2px',
+            },
+            {
+              type: 'filler',
+            },
+          ],
+          flex: 0,
+        },
+        {
+          type: 'text',
+          text: `${searchList[0].name} --${searchList[0].subject}`,
+          gravity: 'center',
+          flex: 3,
+          size: 'sm',
+          align: 'start',
+        },
+      ],
+      spacing: 'lg',
+      cornerRadius: '30px',
+      margin: 'lg',
+    });
+    return client.replyMessage(replyToken, {
+      type: 'flex',
+      altText: '查詢結果',
+      contents: {
+        type: 'bubble',
+        header: {
+          type: 'box',
+          layout: 'vertical',
+          contents: [
+            {
+              type: 'text',
+              text: '查找日期範圍',
+              color: '#FFFFFF',
+              offsetStart: '7px',
+            },
+            {
+              type: 'box',
+              layout: 'baseline',
+              contents: [
+                {
+                  type: 'text',
+                  text: start_time,
+                  color: '#ffffff',
+                  size: 'lg',
+                  flex: 3,
+                  weight: 'bold',
+                  align: 'center',
+                },
+                {
+                  type: 'text',
+                  text: '~',
+                  color: '#ffffff',
+                  size: 'xl',
+                  flex: 1,
+                  weight: 'bold',
+                  align: 'center',
+                },
+                {
+                  type: 'text',
+                  text: end_time,
+                  color: '#ffffff',
+                  size: 'lg',
+                  flex: 3,
+                  weight: 'bold',
+                  align: 'center',
+                },
+              ],
+            },
+          ],
+          paddingAll: '20px',
+          backgroundColor: '#AAAAAA',
+          spacing: 'none',
+          height: '85px',
+          paddingTop: '22px',
+        },
+        body: {
+          type: 'box',
+          layout: 'vertical',
+          contents: searchListContent,
+        },
+        footer: {
+          type: 'box',
+          layout: 'vertical',
+          contents: [
+            {
+              type: 'button',
+              action: {
+                type: 'postback',
+                label: '結束',
+                data: 'finish',
+              },
+              style: 'primary',
+              color: '#AAAAAA',
+            },
+          ],
+          spacing: 'xs',
+        },
+      },
+    });
   } else {
+    searchListContent.push({
+      type: 'text',
+      text: `總計：${searchList.length} 筆`,
+      color: '#b7b7b7',
+      size: 'xs',
+    });
+    searchList.forEach(function (item, index) {
+      if (index == 0) {
+        searchListContent.push({
+          type: 'box',
+          layout: 'horizontal',
+          contents: [
+            {
+              type: 'text',
+              text: `${searchList[0].time}`,
+              size: 'xs',
+              gravity: 'center',
+              flex: 1,
+            },
+            {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                {
+                  type: 'filler',
+                },
+                {
+                  type: 'box',
+                  layout: 'vertical',
+                  contents: [],
+                  cornerRadius: '30px',
+                  height: '12px',
+                  width: '12px',
+                  borderColor: '#AAAAAA',
+                  borderWidth: '2px',
+                },
+                {
+                  type: 'filler',
+                },
+              ],
+              flex: 0,
+            },
+            {
+              type: 'text',
+              text: `${item.time}  ${item.name} --${item.subject}`,
+              gravity: 'center',
+              flex: 3,
+              size: 'sm',
+              align: 'start',
+            },
+          ],
+          spacing: 'lg',
+          cornerRadius: '30px',
+          margin: 'lg',
+        });
+        searchListContent.push({
+          type: 'box',
+          layout: 'horizontal',
+          contents: [
+            {
+              type: 'box',
+              layout: 'baseline',
+              contents: [
+                {
+                  type: 'filler',
+                },
+              ],
+              flex: 1,
+            },
+            {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                {
+                  type: 'box',
+                  layout: 'horizontal',
+                  contents: [
+                    {
+                      type: 'filler',
+                    },
+                    {
+                      type: 'box',
+                      layout: 'vertical',
+                      contents: [],
+                      width: '1.5px',
+                      backgroundColor: '#AAAAAA',
+                    },
+                    {
+                      type: 'filler',
+                    },
+                  ],
+                  flex: 1,
+                },
+              ],
+              width: '12px',
+            },
+            {
+              type: 'text',
+              text: ' ',
+              gravity: 'center',
+              flex: 3,
+              size: 'xs',
+              color: '#8c8c8c',
+            },
+          ],
+          spacing: 'lg',
+          height: '20px',
+        });
+      } else if (index == searchList.length - 1) {
+        searchListContent.push({
+          type: 'box',
+          layout: 'horizontal',
+          contents: [
+            {
+              type: 'text',
+              text: `${searchList[0].time}`,
+              size: 'xs',
+              gravity: 'center',
+              flex: 1,
+            },
+            {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                {
+                  type: 'filler',
+                },
+                {
+                  type: 'box',
+                  layout: 'vertical',
+                  contents: [],
+                  cornerRadius: '30px',
+                  height: '12px',
+                  width: '12px',
+                  borderColor: '#AAAAAA',
+                  borderWidth: '2px',
+                },
+                {
+                  type: 'filler',
+                },
+              ],
+              flex: 0,
+            },
+            {
+              type: 'text',
+              text: `${item.time}  ${item.name} --${item.subject}`,
+              gravity: 'center',
+              flex: 3,
+              size: 'sm',
+              align: 'start',
+            },
+          ],
+          spacing: 'lg',
+          cornerRadius: '30px',
+        });
+      } else {
+        searchListContent.push({
+          type: 'box',
+          layout: 'horizontal',
+          contents: [
+            {
+              type: 'text',
+              text: `${searchList[0].time}`,
+              size: 'xs',
+              gravity: 'center',
+              flex: 1,
+            },
+            {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                {
+                  type: 'filler',
+                },
+                {
+                  type: 'box',
+                  layout: 'vertical',
+                  contents: [],
+                  cornerRadius: '30px',
+                  height: '12px',
+                  width: '12px',
+                  borderColor: '#AAAAAA',
+                  borderWidth: '2px',
+                },
+                {
+                  type: 'filler',
+                },
+              ],
+              flex: 0,
+            },
+            {
+              type: 'text',
+              text: `${item.time}  ${item.name} --${item.subject}`,
+              gravity: 'center',
+              flex: 3,
+              size: 'sm',
+              align: 'start',
+            },
+          ],
+          spacing: 'lg',
+          cornerRadius: '30px',
+        });
+        searchListContent.push({
+          type: 'box',
+          layout: 'horizontal',
+          contents: [
+            {
+              type: 'box',
+              layout: 'baseline',
+              contents: [
+                {
+                  type: 'filler',
+                },
+              ],
+              flex: 1,
+            },
+            {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                {
+                  type: 'box',
+                  layout: 'horizontal',
+                  contents: [
+                    {
+                      type: 'filler',
+                    },
+                    {
+                      type: 'box',
+                      layout: 'vertical',
+                      contents: [],
+                      width: '1.5px',
+                      backgroundColor: '#AAAAAA',
+                    },
+                    {
+                      type: 'filler',
+                    },
+                  ],
+                  flex: 1,
+                },
+              ],
+              width: '12px',
+            },
+            {
+              type: 'text',
+              text: ' ',
+              gravity: 'center',
+              flex: 3,
+              size: 'xs',
+              color: '#8c8c8c',
+            },
+          ],
+          spacing: 'lg',
+          height: '20px',
+        });
+      }
+    });
+    return client.replyMessage(replyToken, {
+      type: 'flex',
+      altText: '查詢結果',
+      contents: {
+        type: 'bubble',
+        header: {
+          type: 'box',
+          layout: 'vertical',
+          contents: [
+            {
+              type: 'text',
+              text: '查詢時間範圍',
+              color: '#FFFFFF',
+              offsetStart: '7px',
+            },
+            {
+              type: 'box',
+              layout: 'baseline',
+              contents: [
+                {
+                  type: 'text',
+                  text: start_time,
+                  color: '#ffffff',
+                  size: 'lg',
+                  flex: 3,
+                  weight: 'bold',
+                  align: 'center',
+                },
+                {
+                  type: 'text',
+                  text: '~',
+                  color: '#ffffff',
+                  size: 'xl',
+                  flex: 1,
+                  weight: 'bold',
+                  align: 'center',
+                },
+                {
+                  type: 'text',
+                  text: end_time,
+                  color: '#ffffff',
+                  size: 'lg',
+                  flex: 3,
+                  weight: 'bold',
+                  align: 'center',
+                },
+              ],
+            },
+          ],
+          paddingAll: '20px',
+          backgroundColor: '#AAAAAA',
+          spacing: 'none',
+          height: '85px',
+          paddingTop: '22px',
+        },
+        body: {
+          type: 'box',
+          layout: 'vertical',
+          contents: searchListContent,
+        },
+        footer: {
+          type: 'box',
+          layout: 'vertical',
+          contents: [
+            {
+              type: 'button',
+              action: {
+                type: 'postback',
+                label: '結束',
+                data: 'finish',
+              },
+              style: 'primary',
+              color: '#AAAAAA',
+            },
+          ],
+          spacing: 'xs',
+        },
+      },
+    });
   }
 }
 /** 清空資料
  * @description 所有參數回復初始值
  */
 function resetSearchOrder() {
-  setStatus(false);
-  setChosenStatus(false);
   resetSearchList();
+  searchDate = '';
   start_time = '';
   end_date = '';
 }
@@ -551,7 +997,15 @@ function resetSearchList() {
   searchList = [];
   searchListContent = [];
 }
-function finish(replyToken) {}
+function finish(replyToken) {
+  resetSearchOrder();
+  // 結束流程
+  PROCESS_MANAGER.resetProcess();
+  return client.replyMessage(replyToken, {
+    type: 'text',
+    text: '結束-查詢時段流程',
+  });
+}
 module.exports = {
   init_search,
   cancelSearch,
@@ -561,5 +1015,6 @@ module.exports = {
   search,
   resetSearchOrder,
   resetSearchList,
+  show,
   finish,
 };

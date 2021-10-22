@@ -74,11 +74,8 @@ function handleText(message, replyToken, source, process) {
           return handleErrorInput(replyToken);
         }
       case 'SEARCH':
-        if (searchController.getStatus()) {
-        } else {
-          searchController.resetNewOrder();
-          return handleErrorInput(replyToken);
-        }
+        searchController.resetSearchOrder();
+        return handleErrorInput(replyToken);
       case 'MODIFY':
         //? 是否為名字輸入狀態
         if (modifyController.getStatus()) {
@@ -144,7 +141,7 @@ function handleText(message, replyToken, source, process) {
       case '查詢人數':
         return COUNT_SERVICE.execute(replyToken);
       //* 查詢 search
-      case '查詢指定客戶':
+      case '查詢時段':
         return SEARCH_SERVICE.execute(replyToken);
       //* 修改 modify
       case '修改預約':
@@ -153,7 +150,7 @@ function handleText(message, replyToken, source, process) {
       case '取消預約':
         return CANCEL_SERVICE.execute(replyToken);
       //* 檢視 show
-      case '查詢客戶':
+      case '查詢預約':
         return SHOW_SERVICE.execute(replyToken);
       //* 其他無效指令
       default:

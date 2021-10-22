@@ -199,11 +199,11 @@ function execute(replyToken, postback, process) {
         case 'cancel':
           return searchController.cancelSearch(replyToken);
         case 'searchDate':
-          return searchController.handleDate(replyToken);
+          return searchController.handleDate(replyToken, postback.params.date);
         case 'startTime':
-          return searchController.handleStartTime(replyToken, postback.params.date);
+          return searchController.handleStartTime(replyToken, postback.params.time);
         case 'endTime':
-          return searchController.handleEndTime(replyToken, postback.params.date);
+          return searchController.handleEndTime(replyToken, postback.params.time);
         case 'search':
           return searchController.search(replyToken);
         case 'show':
