@@ -1,20 +1,16 @@
 /** @format */
 
 'use strict';
-// const https = require('https');
 const line = require('@line/bot-sdk');
 const express = require('express');
 const dotenv = require('dotenv');
 dotenv.config();
 
-//./ngrok authtoken 1yR6gzVzm5ap3A8VViWMB5v2B8f_6ALZByubepQLWKcMaTp1x
-//ngrok http 3000
-
-// https://beautyhair-secretary-linebot.herokuapp.com/callback
 // create LINE SDK config from env variables
 const config = {
-  channelAccessToken: process.env['CHANNEL_ACCESS_TOKEN'],
-  channelSecret: process.env['CHANNEL_SECRET'],
+  channelAccessToken:
+    '1fbsDsWXQUm2i2kQ2Tvox3Rxm75lZK5qk0NDNh2PllERfHX1GK0cqCptdVIvnCYb3T8WJCadbC7BgJtYTCkDNsnvljVRTZqa2mm7MST6TOtlDgtGI56g7XoeAG92Cqd9vooeulnc3N1JaiOGPSHSKgdB04t89/1O/w1cDnyilFU=',
+  channelSecret: 'bd987adc7c9eb33f7ee378060e018687',
 };
 
 // create LINE SDK client
@@ -25,27 +21,6 @@ const app = express();
 const MESSAGE_EVENT = require('./src/event/message.event');
 const POSTBACK_SERVICE = require('./src/event/postback.event');
 const PROCESS_MANAGER = require('./src/manager/processManager');
-// * PYTHON
-// const spawn = require('child_process').spawn;
-// const pythonProcess = spawn('python', ['./hello.py']);
-// pythonProcess.stdout.on('data', data => {
-//   console.log(`${data}`);
-// });
-
-// const richMenu = require('./richMenu');
-// * post rich menu
-// client
-//   .createRichMenu(richMenu)
-//   .then(richMenuId => console.log(richMenuId))
-//   .catch(err => console.error(err));
-// * post rich menu image
-// client
-//   .setRichMenuImage(
-//     'richmenu-b3d135dab7fb8d8f840e733c182d195c',
-//     fs.createReadStream('./public/richMenu.png')
-//   )
-//   .then(res => console.log(res))
-//   .catch(err => console.error(err));
 
 app.get('/', (_req, res) => {
   res.sendStatus(200);
