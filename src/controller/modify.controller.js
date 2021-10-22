@@ -40,10 +40,16 @@ let newOrder = {
  */
 function init_modify(replyToken) {
   setStatus(true);
-  return client.replyMessage(replyToken, {
-    type: 'text',
-    text: '請輸入預約的客戶姓名(格式為m/xx)',
-  });
+  return client.replyMessage(replyToken, [
+    {
+      type: 'text',
+      text: '請輸入客戶姓名(可複製以下格式)',
+    },
+    {
+      type: 'text',
+      text: 'm/',
+    },
+  ]);
 }
 
 /** 取消-更改預約

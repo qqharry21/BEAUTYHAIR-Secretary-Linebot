@@ -36,10 +36,16 @@ let cancelOrder = {
  */
 function init_cancel(replyToken) {
   setStatus(true);
-  return client.replyMessage(replyToken, {
-    type: 'text',
-    text: '請輸入預約的客戶姓名(格式為c/xx)',
-  });
+  return client.replyMessage(replyToken, [
+    {
+      type: 'text',
+      text: '請輸入客戶姓名(可複製以下格式)',
+    },
+    {
+      type: 'text',
+      text: 'c/',
+    },
+  ]);
 }
 
 function cancel(replyToken) {

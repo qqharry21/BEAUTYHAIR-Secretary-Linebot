@@ -34,7 +34,11 @@ function init_book(replyToken) {
   return client.replyMessage(replyToken, [
     {
       type: 'text',
-      text: '請輸入客戶姓名(格式為b/xx)',
+      text: '請輸入客戶姓名(可複製以下格式)',
+    },
+    {
+      type: 'text',
+      text: 'b/',
     },
   ]);
 }

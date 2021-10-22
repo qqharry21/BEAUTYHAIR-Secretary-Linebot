@@ -98,10 +98,16 @@ function cancelShow(replyToken) {
 
 function searchName(replyToken) {
   setStatus(true);
-  return client.replyMessage(replyToken, {
-    type: 'text',
-    text: '請輸入客戶姓名(格式為s/xx)',
-  });
+  return client.replyMessage(replyToken, [
+    {
+      type: 'text',
+      text: '請輸入客戶姓名(可複製以下格式)',
+    },
+    {
+      type: 'text',
+      text: 's/',
+    },
+  ]);
 }
 function searchDate(replyToken) {
   return client.replyMessage(replyToken, {
@@ -210,7 +216,7 @@ function handleName(replyToken, text) {
                 contents: [
                   {
                     type: 'text',
-                    text: item.date,
+                    text: res[0].date,
                     size: 'xs',
                     gravity: 'center',
                   },
@@ -239,7 +245,7 @@ function handleName(replyToken, text) {
                   },
                   {
                     type: 'text',
-                    text: `${HELPER.timeChange(item.time)} --${item.subject}`,
+                    text: `${HELPER.timeChange(res[0].time)} --${res[0].subject}`,
                     gravity: 'center',
                     flex: 2,
                     size: 'sm',
