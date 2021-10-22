@@ -2,14 +2,6 @@
 
 var mysql2 = require('mysql2');
 
-const query = mysql2.createConnection({
-  user: 'b4fc5f71b5dd95',
-  host: 'us-cdbr-east-04.cleardb.com',
-  password: '7ead9883',
-  database: 'heroku_7a65dc3b032abd6',
-  multipleStatements: true,
-});
-
 const pool = mysql2.createPool({
   user: 'b4fc5f71b5dd95',
   host: 'us-cdbr-east-04.cleardb.com',
@@ -39,5 +31,4 @@ var query = function (sql, options, callback) {
   });
 };
 
-// mysql: module.exports = db;
 module.exports = query;
