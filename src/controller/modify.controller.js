@@ -43,11 +43,11 @@ function init_modify(replyToken) {
   return client.replyMessage(replyToken, [
     {
       type: 'text',
-      text: '請輸入客戶姓名(可複製以下格式)',
+      text: '請輸入客戶姓名(至少一個字，並在後方補上*)',
     },
     {
       type: 'text',
-      text: 'm/',
+      text: '範例: 陳*',
     },
   ]);
 }

@@ -39,11 +39,11 @@ function init_cancel(replyToken) {
   return client.replyMessage(replyToken, [
     {
       type: 'text',
-      text: '請輸入客戶姓名(可複製以下格式)',
+      text: '請輸入客戶姓名(至少一個字，並在後方補上*)',
     },
     {
       type: 'text',
-      text: 'c/',
+      text: '範例: 陳*',
     },
   ]);
 }
@@ -69,7 +69,7 @@ function handleName(replyToken, text) {
   if (text.length > 1) {
     text = text.split('*', 1).shift();
     const sqlSelect =
-      'SELECT `id`, `name`, `date`, `time`, `endTime`, `subject` FROM `order` WHERE `name` LIKE CONCAT(?, "%") AND `date` > NOW() ORDER BY ABS( DATEDIFF( `date`, NOW() ) ) ,`create_time` DESC';
+      'SELECT `id`, `name`, `date`, `time`, `endTime`, `subject` FROM `order` WHERE `name` LIKE CONCAT("%", ?, "%") AND `date` > NOW() ORDER BY ABS( DATEDIFF( `date`, NOW() ) ) ,`create_time` DESC';
     query(sqlSelect, [text], (err, result) => {
       //? 是否有抓到相符資料
       if (result.length > 0) {
