@@ -35,7 +35,7 @@ function handleText(message, replyToken, source, process) {
         // ? 是否為名字輸入狀態
         if (bookController.getStatus()) {
           // ? 是否符合名字格式
-          if (text.match('^b/[\u4e00-\u9fa5a-zA-Z]+$')) {
+          if (text.match('^b/[\u4e00-\u9fa5a-zA-Z.*]+$')) {
             console.log('match book');
             return bookController.handleName(replyToken, text.split('b/').pop());
           } else {
@@ -63,7 +63,7 @@ function handleText(message, replyToken, source, process) {
         return handleErrorInput(replyToken);
       case 'SHOW':
         if (showController.getStatus()) {
-          if (text.match('^s/[\u4e00-\u9fa5a-zA-Z]+$')) {
+          if (text.match('^s/[\u4e00-\u9fa5a-zA-Z.*]+$')) {
             console.log('match show');
             return showController.handleName(replyToken, text.split('s/').pop());
           } else {
@@ -81,7 +81,7 @@ function handleText(message, replyToken, source, process) {
         //? 是否為名字輸入狀態
         if (modifyController.getStatus()) {
           //? 是否符合名字格式
-          if (text.match('^m/[\u4e00-\u9fa5a-zA-Z]+$')) {
+          if (text.match('^m/[\u4e00-\u9fa5a-zA-Z.*]+$')) {
             console.log('match modify');
             return modifyController.handleName(replyToken, text.split('m/').pop());
           } else {
@@ -92,7 +92,7 @@ function handleText(message, replyToken, source, process) {
         //? 是否為更改名字輸入狀態
         else if (modifyController.getNameStatus()) {
           //? 是否符合更改名字格式
-          if (text.match('^b/[\u4e00-\u9fa5a-zA-Z]+$')) {
+          if (text.match('^b/[\u4e00-\u9fa5a-zA-Z.*]+$')) {
             console.log('match modifyName');
             return modifyController.handleModifyName(replyToken, text.split('b/').pop());
           } else {
@@ -119,7 +119,7 @@ function handleText(message, replyToken, source, process) {
         //? 是否為名字輸入狀態
         if (cancelController.getStatus()) {
           //? 是否符合名字格式
-          if (text.match('^c/[\u4e00-\u9fa5a-zA-Z]+$')) {
+          if (text.match('^c/[\u4e00-\u9fa5a-zA-Z.*]+$')) {
             console.log('match cancel');
             return cancelController.handleName(replyToken, text.split('c/').pop());
           } else {
