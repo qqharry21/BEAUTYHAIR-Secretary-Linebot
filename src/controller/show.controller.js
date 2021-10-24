@@ -595,9 +595,7 @@ function handleName(replyToken, text) {
         });
       } else {
         //找到多個類似姓名的客戶
-
         result.forEach(function (item, index) {
-          console.log('item', item.name);
           showList.push({
             type: 'bubble',
             size: 'micro',
@@ -696,7 +694,7 @@ function choose(replyToken, name) {
       if (result.length == 1) {
         showListContent.push({
           type: 'text',
-          text: `預約次數：${showTotal}筆`,
+          text: `預約次數：${result.length}筆`,
           color: '#b7b7b7',
           size: 'xs',
         });
@@ -706,7 +704,7 @@ function choose(replyToken, name) {
           contents: [
             {
               type: 'text',
-              text: item.date,
+              text: result[0].date,
               size: 'xs',
               gravity: 'center',
             },
@@ -735,7 +733,7 @@ function choose(replyToken, name) {
             },
             {
               type: 'text',
-              text: `${HELPER.timeChange(item.time)} --${item.subject}`,
+              text: `${HELPER.timeChange(result[0].time)} --${result[0].subject}`,
               gravity: 'center',
               flex: 2,
               size: 'sm',
