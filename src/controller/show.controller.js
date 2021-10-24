@@ -173,7 +173,7 @@ function searchDate(replyToken) {
 function handleName(replyToken, text) {
   setStatus(false);
   if (text.length > 1) {
-    text = HELPER.searchAll(text);
+    text = text.slice('*', 1).shift();
     const sqlSelect = 'SELECT DISTINCT `name` FROM `order` WHERE `name` LIKE CONCAT("%", ?, "%")';
 
     query(sqlSelect, [text], (err, result) => {
@@ -595,7 +595,9 @@ function handleName(replyToken, text) {
         });
       } else {
         //找到多個類似姓名的客戶
+
         result.forEach(function (item, index) {
+          console.log('item', item.name);
           showList.push({
             type: 'bubble',
             size: 'micro',
@@ -678,6 +680,7 @@ function handleName(replyToken, text) {
 
 function choose(replyToken, name) {
   setChosenStatus(false);
+  console.log('name', name);
   const sqlSelect =
     'SELECT `date`, `time`, `subject` FROM `order` WHERE `name` = ? ORDER BY `date` ASC, `time` ASC';
   query(sqlSelect, [name], (err, result) => {

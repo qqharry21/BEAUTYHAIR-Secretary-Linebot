@@ -27,3 +27,4 @@ yarn-error.log*
 .env.production.local
 
 ngrok.exe
+Readme1.md
