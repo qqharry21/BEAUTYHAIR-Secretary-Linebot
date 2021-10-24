@@ -678,11 +678,11 @@ function handleName(replyToken, text) {
 
 function choose(replyToken, name) {
   setChosenStatus(false);
-  console.log('name', name);
   const sqlSelect =
     'SELECT `date`, `time`, `subject` FROM `order` WHERE `name` = ? ORDER BY `date` ASC, `time` ASC';
   query(sqlSelect, [name], (err, result) => {
     if (err) {
+      console.log('err', err);
       resetShowOrder();
       PROCESS_MANAGER.resetProcess();
       return client.replyMessage(replyToken, {
@@ -690,7 +690,6 @@ function choose(replyToken, name) {
         text: '發生錯誤，請通知管理員',
       });
     } else {
-      console.log('res', result);
       if (result.length == 1) {
         showListContent.push({
           type: 'text',
@@ -1077,7 +1076,7 @@ function handleDay(replyToken, date) {
   const sqlSelect = 'SELECT * FROM `order` WHERE `date` = ? ORDER BY `time`';
   query(sqlSelect, [date], (err, result) => {
     if (err) {
-      console.log(err);
+      console.log('err', err);
       resetShowOrder();
       PROCESS_MANAGER.resetProcess();
       return client.replyMessage(replyToken, { type: 'text', text: '發生錯誤，請通知管理員' });
