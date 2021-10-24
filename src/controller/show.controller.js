@@ -173,7 +173,7 @@ function searchDate(replyToken) {
 function handleName(replyToken, text) {
   setStatus(false);
   if (text.length > 1) {
-    text = text.slice('*', 1).shift();
+    text = text.split('*', 1).shift();
     const sqlSelect = 'SELECT DISTINCT `name` FROM `order` WHERE `name` LIKE CONCAT("%", ?, "%")';
 
     query(sqlSelect, [text], (err, result) => {

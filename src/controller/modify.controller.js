@@ -91,7 +91,7 @@ function handleName(replyToken, text) {
   setStatus(false);
   //? 客戶姓名是否輸入大於兩個字
   if (text.length > 1) {
-    text = text.slice('*', 1).shift();
+    text = text.split('*', 1).shift();
     const sqlSelect =
       'SELECT `id`, `name`, `date`, `time`, `endTime`, `subject` FROM `order` WHERE `name` LIKE CONCAT("%", ?, "%") AND `date` > NOW() ORDER BY ABS( DATEDIFF( `date`, NOW() ) ) ,`create_time` DESC';
     query(sqlSelect, [text], (err, result) => {
