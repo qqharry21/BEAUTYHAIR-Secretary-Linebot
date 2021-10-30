@@ -23,7 +23,7 @@ function execute(replyToken) {
           label: '是',
           type: 'postback',
           displayText: '我要更改預約',
-          data: 'modify',
+          data: 'start',
         },
         {
           label: '否',
