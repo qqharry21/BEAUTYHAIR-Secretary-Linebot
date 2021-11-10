@@ -93,7 +93,7 @@ function handleName(replyToken, text) {
   if (text.length > 1) {
     text = text.split('*', 1).shift();
     const sqlSelect =
-      'SELECT `id`, `name`, `date`, `time`, `endTime`, `subject` FROM `order` WHERE `name` LIKE CONCAT("%", ?, "%") AND `date` > NOW() ORDER BY ABS( DATEDIFF( `date`, NOW() ) ) ,`create_time` DESC';
+      'SELECT `id`, `name`, `date`, `time`, `endTime`, `subject` FROM `order` WHERE `name` LIKE CONCAT("%", ?, "%")  ORDER BY `date` DESC, `create_time` DESC';
     query(sqlSelect, [text], (err, result) => {
       //? 是否有抓到相符資料
       if (result.length > 0) {
