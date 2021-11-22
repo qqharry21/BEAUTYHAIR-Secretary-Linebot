@@ -1634,353 +1634,365 @@ function searchRange(replyToken) {
       PROCESS_MANAGER.resetProcess();
       return client.replyMessage(replyToken, [{ type: 'text', text: '發生錯誤，請通知管理員' }]);
     } else {
-      showListContent.push({
-        type: 'text',
-        text: `總計：${result.length} 筆`,
-        color: '#b7b7b7',
-        size: 'xs',
-      });
-      result.forEach(function (item, index) {
-        if (index == 0) {
-          showListContent.push({
-            type: 'box',
-            layout: 'horizontal',
-            contents: [
-              {
-                type: 'text',
-                text: item.date.split('-', 2).pop() + '/' + item.date.split('-', 3).pop(),
-                size: 'xs',
-                gravity: 'center',
-                flex: 1,
-              },
-              {
-                type: 'box',
-                layout: 'vertical',
-                contents: [
-                  {
-                    type: 'filler',
-                  },
-                  {
-                    type: 'box',
-                    layout: 'vertical',
-                    contents: [],
-                    cornerRadius: '30px',
-                    height: '12px',
-                    width: '12px',
-                    borderColor: '#9E4751',
-                    borderWidth: '2px',
-                  },
-                  {
-                    type: 'filler',
-                  },
-                ],
-                flex: 0,
-              },
-              {
-                type: 'text',
-                text: `${item.time}  ${item.name} --${item.subject}`,
-                gravity: 'center',
-                flex: 3,
-                size: 'sm',
-                align: 'start',
-              },
-            ],
-            spacing: 'lg',
-            cornerRadius: '30px',
-            margin: 'lg',
-          });
-          showListContent.push({
-            type: 'box',
-            layout: 'horizontal',
-            contents: [
-              {
-                type: 'box',
-                layout: 'baseline',
-                contents: [
-                  {
-                    type: 'filler',
-                  },
-                ],
-                flex: 1,
-              },
-              {
-                type: 'box',
-                layout: 'vertical',
-                contents: [
-                  {
-                    type: 'box',
-                    layout: 'horizontal',
-                    contents: [
-                      {
-                        type: 'filler',
-                      },
-                      {
-                        type: 'box',
-                        layout: 'vertical',
-                        contents: [],
-                        width: '1.5px',
-                        backgroundColor: '#9E4751',
-                      },
-                      {
-                        type: 'filler',
-                      },
-                    ],
-                    flex: 1,
-                  },
-                ],
-                width: '12px',
-              },
-              {
-                type: 'text',
-                text: ' ',
-                gravity: 'center',
-                flex: 3,
-                size: 'xs',
-                color: '#8c8c8c',
-              },
-            ],
-            spacing: 'lg',
-            height: '20px',
-          });
-        } else if (index == result.length - 1) {
-          showListContent.push({
-            type: 'box',
-            layout: 'horizontal',
-            contents: [
-              {
-                type: 'text',
-                text: item.date.split('-', 2).pop() + '/' + item.date.split('-', 3).pop(),
-                size: 'xs',
-                gravity: 'center',
-                flex: 1,
-              },
-              {
-                type: 'box',
-                layout: 'vertical',
-                contents: [
-                  {
-                    type: 'filler',
-                  },
-                  {
-                    type: 'box',
-                    layout: 'vertical',
-                    contents: [],
-                    cornerRadius: '30px',
-                    height: '12px',
-                    width: '12px',
-                    borderColor: '#9E4751',
-                    borderWidth: '2px',
-                  },
-                  {
-                    type: 'filler',
-                  },
-                ],
-                flex: 0,
-              },
-              {
-                type: 'text',
-                text: `${item.time}  ${item.name} --${item.subject}`,
-                gravity: 'center',
-                flex: 3,
-                size: 'sm',
-                align: 'start',
-              },
-            ],
-            spacing: 'lg',
-            cornerRadius: '30px',
-          });
-        } else {
-          showListContent.push({
-            type: 'box',
-            layout: 'horizontal',
-            contents: [
-              {
-                type: 'text',
-                text: item.date.split('-', 2).pop() + '/' + item.date.split('-', 3).pop(),
-                size: 'xs',
-                gravity: 'center',
-                flex: 1,
-              },
-              {
-                type: 'box',
-                layout: 'vertical',
-                contents: [
-                  {
-                    type: 'filler',
-                  },
-                  {
-                    type: 'box',
-                    layout: 'vertical',
-                    contents: [],
-                    cornerRadius: '30px',
-                    height: '12px',
-                    width: '12px',
-                    borderColor: '#9E4751',
-                    borderWidth: '2px',
-                  },
-                  {
-                    type: 'filler',
-                  },
-                ],
-                flex: 0,
-              },
-              {
-                type: 'text',
-                text: `${item.time}  ${item.name} --${item.subject}`,
-                gravity: 'center',
-                flex: 3,
-                size: 'sm',
-                align: 'start',
-              },
-            ],
-            spacing: 'lg',
-            cornerRadius: '30px',
-          });
-          showListContent.push({
-            type: 'box',
-            layout: 'horizontal',
-            contents: [
-              {
-                type: 'box',
-                layout: 'baseline',
-                contents: [
-                  {
-                    type: 'filler',
-                  },
-                ],
-                flex: 1,
-              },
-              {
-                type: 'box',
-                layout: 'vertical',
-                contents: [
-                  {
-                    type: 'box',
-                    layout: 'horizontal',
-                    contents: [
-                      {
-                        type: 'filler',
-                      },
-                      {
-                        type: 'box',
-                        layout: 'vertical',
-                        contents: [],
-                        width: '1.5px',
-                        backgroundColor: '#9E4751',
-                      },
-                      {
-                        type: 'filler',
-                      },
-                    ],
-                    flex: 1,
-                  },
-                ],
-                width: '12px',
-              },
-              {
-                type: 'text',
-                text: ' ',
-                gravity: 'center',
-                flex: 3,
-                size: 'xs',
-                color: '#8c8c8c',
-              },
-            ],
-            spacing: 'lg',
-            height: '20px',
-          });
-        }
-      });
-      return client.replyMessage(replyToken, {
-        type: 'flex',
-        altText: '查詢結果',
-        contents: {
-          type: 'bubble',
-          size: 'giga',
-          header: {
-            type: 'box',
-            layout: 'vertical',
-            contents: [
-              {
-                type: 'text',
-                text: '查找日期範圍',
-                color: '#FFFFFF',
-                offsetStart: '7px',
-              },
-              {
-                type: 'box',
-                layout: 'baseline',
-                contents: [
-                  {
-                    type: 'text',
-                    text: start_date,
-                    color: '#ffffff',
-                    size: 'lg',
-                    flex: 3,
-                    weight: 'bold',
-                    align: 'center',
-                  },
-                  {
-                    type: 'text',
-                    text: '~',
-                    color: '#ffffff',
-                    size: 'xl',
-                    flex: 1,
-                    weight: 'bold',
-                    align: 'center',
-                  },
-                  {
-                    type: 'text',
-                    text: end_date,
-                    color: '#ffffff',
-                    size: 'lg',
-                    flex: 3,
-                    weight: 'bold',
-                    align: 'center',
-                  },
-                ],
-              },
-            ],
-            paddingAll: '20px',
-            backgroundColor: '#9E4751',
-            spacing: 'none',
-            height: '85px',
-            paddingTop: '22px',
+      resetShowList();
+      if (result.length > 30) {
+        return client.replyMessage(replyToken, [
+          {
+            type: 'text',
+            text: '查詢範圍日期過大，請縮小查詢範圍重新點選功能查詢，或前往notion查看!',
           },
-          body: {
-            type: 'box',
-            layout: 'vertical',
-            contents: showListContent,
-          },
-          footer: {
-            type: 'box',
-            layout: 'horizontal',
-            contents: [
-              {
-                type: 'button',
-                action: {
-                  type: 'postback',
-                  label: '繼續查詢',
-                  data: 'continue',
+        ]);
+      } else {
+        // 總計
+        showListContent.push({
+          type: 'text',
+          text: `總計：${result.length} 筆`,
+          color: '#b7b7b7',
+          size: 'xs',
+        });
+        // 內容
+        result.forEach(function (item, index) {
+          if (index == 0) {
+            showListContent.push({
+              type: 'box',
+              layout: 'horizontal',
+              contents: [
+                {
+                  type: 'text',
+                  text: item.date.split('-', 2).pop() + '/' + item.date.split('-', 3).pop(),
+                  size: 'xs',
+                  gravity: 'center',
+                  flex: 1,
                 },
-                style: 'link',
-                color: '#9E4751',
-              },
-              {
-                type: 'button',
-                action: {
-                  type: 'postback',
-                  label: '結束',
-                  data: 'finish',
+                {
+                  type: 'box',
+                  layout: 'vertical',
+                  contents: [
+                    {
+                      type: 'filler',
+                    },
+                    {
+                      type: 'box',
+                      layout: 'vertical',
+                      contents: [],
+                      cornerRadius: '30px',
+                      height: '12px',
+                      width: '12px',
+                      borderColor: '#9E4751',
+                      borderWidth: '2px',
+                    },
+                    {
+                      type: 'filler',
+                    },
+                  ],
+                  flex: 0,
                 },
-                style: 'primary',
-                color: '#9E4751',
-              },
-            ],
-            spacing: 'xs',
+                {
+                  type: 'text',
+                  text: `${item.time}  ${item.name} --${item.subject}`,
+                  gravity: 'center',
+                  flex: 3,
+                  size: 'sm',
+                  align: 'start',
+                },
+              ],
+              spacing: 'lg',
+              cornerRadius: '30px',
+              margin: 'lg',
+            });
+            showListContent.push({
+              type: 'box',
+              layout: 'horizontal',
+              contents: [
+                {
+                  type: 'box',
+                  layout: 'baseline',
+                  contents: [
+                    {
+                      type: 'filler',
+                    },
+                  ],
+                  flex: 1,
+                },
+                {
+                  type: 'box',
+                  layout: 'vertical',
+                  contents: [
+                    {
+                      type: 'box',
+                      layout: 'horizontal',
+                      contents: [
+                        {
+                          type: 'filler',
+                        },
+                        {
+                          type: 'box',
+                          layout: 'vertical',
+                          contents: [],
+                          width: '1.5px',
+                          backgroundColor: '#9E4751',
+                        },
+                        {
+                          type: 'filler',
+                        },
+                      ],
+                      flex: 1,
+                    },
+                  ],
+                  width: '12px',
+                },
+                {
+                  type: 'text',
+                  text: ' ',
+                  gravity: 'center',
+                  flex: 3,
+                  size: 'xs',
+                  color: '#8c8c8c',
+                },
+              ],
+              spacing: 'lg',
+              height: '20px',
+            });
+          } else if (index == result.length - 1) {
+            showListContent.push({
+              type: 'box',
+              layout: 'horizontal',
+              contents: [
+                {
+                  type: 'text',
+                  text: item.date.split('-', 2).pop() + '/' + item.date.split('-', 3).pop(),
+                  size: 'xs',
+                  gravity: 'center',
+                  flex: 1,
+                },
+                {
+                  type: 'box',
+                  layout: 'vertical',
+                  contents: [
+                    {
+                      type: 'filler',
+                    },
+                    {
+                      type: 'box',
+                      layout: 'vertical',
+                      contents: [],
+                      cornerRadius: '30px',
+                      height: '12px',
+                      width: '12px',
+                      borderColor: '#9E4751',
+                      borderWidth: '2px',
+                    },
+                    {
+                      type: 'filler',
+                    },
+                  ],
+                  flex: 0,
+                },
+                {
+                  type: 'text',
+                  text: `${item.time}  ${item.name} --${item.subject}`,
+                  gravity: 'center',
+                  flex: 3,
+                  size: 'sm',
+                  align: 'start',
+                },
+              ],
+              spacing: 'lg',
+              cornerRadius: '30px',
+            });
+          } else {
+            showListContent.push({
+              type: 'box',
+              layout: 'horizontal',
+              contents: [
+                {
+                  type: 'text',
+                  text: item.date.split('-', 2).pop() + '/' + item.date.split('-', 3).pop(),
+                  size: 'xs',
+                  gravity: 'center',
+                  flex: 1,
+                },
+                {
+                  type: 'box',
+                  layout: 'vertical',
+                  contents: [
+                    {
+                      type: 'filler',
+                    },
+                    {
+                      type: 'box',
+                      layout: 'vertical',
+                      contents: [],
+                      cornerRadius: '30px',
+                      height: '12px',
+                      width: '12px',
+                      borderColor: '#9E4751',
+                      borderWidth: '2px',
+                    },
+                    {
+                      type: 'filler',
+                    },
+                  ],
+                  flex: 0,
+                },
+                {
+                  type: 'text',
+                  text: `${item.time}  ${item.name} --${item.subject}`,
+                  gravity: 'center',
+                  flex: 3,
+                  size: 'sm',
+                  align: 'start',
+                },
+              ],
+              spacing: 'lg',
+              cornerRadius: '30px',
+            });
+            showListContent.push({
+              type: 'box',
+              layout: 'horizontal',
+              contents: [
+                {
+                  type: 'box',
+                  layout: 'baseline',
+                  contents: [
+                    {
+                      type: 'filler',
+                    },
+                  ],
+                  flex: 1,
+                },
+                {
+                  type: 'box',
+                  layout: 'vertical',
+                  contents: [
+                    {
+                      type: 'box',
+                      layout: 'horizontal',
+                      contents: [
+                        {
+                          type: 'filler',
+                        },
+                        {
+                          type: 'box',
+                          layout: 'vertical',
+                          contents: [],
+                          width: '1.5px',
+                          backgroundColor: '#9E4751',
+                        },
+                        {
+                          type: 'filler',
+                        },
+                      ],
+                      flex: 1,
+                    },
+                  ],
+                  width: '12px',
+                },
+                {
+                  type: 'text',
+                  text: ' ',
+                  gravity: 'center',
+                  flex: 3,
+                  size: 'xs',
+                  color: '#8c8c8c',
+                },
+              ],
+              spacing: 'lg',
+              height: '20px',
+            });
+          }
+        });
+        return client.replyMessage(replyToken, {
+          type: 'flex',
+          altText: '查詢結果',
+          contents: {
+            type: 'bubble',
+            size: 'giga',
+            header: {
+              type: 'box',
+              layout: 'vertical',
+              contents: [
+                {
+                  type: 'text',
+                  text: '查找日期範圍',
+                  color: '#FFFFFF',
+                  offsetStart: '7px',
+                },
+                {
+                  type: 'box',
+                  layout: 'baseline',
+                  contents: [
+                    {
+                      type: 'text',
+                      text: start_date,
+                      color: '#ffffff',
+                      size: 'lg',
+                      flex: 3,
+                      weight: 'bold',
+                      align: 'center',
+                    },
+                    {
+                      type: 'text',
+                      text: '~',
+                      color: '#ffffff',
+                      size: 'xl',
+                      flex: 1,
+                      weight: 'bold',
+                      align: 'center',
+                    },
+                    {
+                      type: 'text',
+                      text: end_date,
+                      color: '#ffffff',
+                      size: 'lg',
+                      flex: 3,
+                      weight: 'bold',
+                      align: 'center',
+                    },
+                  ],
+                },
+              ],
+              paddingAll: '20px',
+              backgroundColor: '#9E4751',
+              spacing: 'none',
+              height: '85px',
+              paddingTop: '22px',
+            },
+            body: {
+              type: 'box',
+              layout: 'vertical',
+              contents: showListContent,
+            },
+            footer: {
+              type: 'box',
+              layout: 'horizontal',
+              contents: [
+                {
+                  type: 'button',
+                  action: {
+                    type: 'postback',
+                    label: '繼續查詢',
+                    data: 'continue',
+                  },
+                  style: 'link',
+                  color: '#9E4751',
+                },
+                {
+                  type: 'button',
+                  action: {
+                    type: 'postback',
+                    label: '結束',
+                    data: 'finish',
+                  },
+                  style: 'primary',
+                  color: '#9E4751',
+                },
+              ],
+              spacing: 'xs',
+            },
           },
-        },
-      });
+        });
+      }
     }
   });
 }
