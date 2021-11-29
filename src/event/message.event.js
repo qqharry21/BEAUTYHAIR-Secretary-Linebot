@@ -40,7 +40,7 @@ function handleText(message, replyToken, source, process) {
             return bookController.handleName(replyToken, text.split('b/').pop());
           } else {
             bookController.resetOrder();
-            return handleErrorInput(replyToken);
+            return handleErrorInput(replyToken, '格式錯誤，請重新點選功能');
           }
         }
         //? 是否為項目輸入狀態
@@ -52,15 +52,15 @@ function handleText(message, replyToken, source, process) {
             return bookController.confirmBook(replyToken);
           } else {
             bookController.resetOrder();
-            return handleErrorInput(replyToken);
+            return handleErrorInput(replyToken, '格式錯誤，請重新點選功能');
           }
         } else {
           bookController.resetOrder();
-          return handleErrorInput(replyToken);
+          return handleErrorInput(replyToken, '格式錯誤，請重新點選功能');
         }
       case 'COUNT':
         countController.resetCountOrder();
-        return handleErrorInput(replyToken);
+        return handleErrorInput(replyToken, '格式錯誤，請重新點選功能');
       case 'SHOW':
         if (showController.getStatus()) {
           if (text.match('^[\u4e00-\u9fa5a-zA-Z.*]+$')) {
@@ -68,15 +68,15 @@ function handleText(message, replyToken, source, process) {
             return showController.handleName(replyToken, text.split('s/').pop());
           } else {
             showController.resetShowOrder();
-            return handleErrorInput(replyToken);
+            return handleErrorInput(replyToken, '格式錯誤，請重新點選功能');
           }
         } else {
           showController.resetShowOrder();
-          return handleErrorInput(replyToken);
+          return handleErrorInput(replyToken, '格式錯誤，請重新點選功能');
         }
       case 'SEARCH':
         searchController.resetSearchOrder();
-        return handleErrorInput(replyToken);
+        return handleErrorInput(replyToken, '格式錯誤，請重新點選功能');
       case 'MODIFY':
         //? 是否為名字輸入狀態
         if (modifyController.getStatus()) {
@@ -86,7 +86,7 @@ function handleText(message, replyToken, source, process) {
             return modifyController.handleName(replyToken, text.split('m/').pop());
           } else {
             modifyController.resetNewOrder();
-            return handleErrorInput(replyToken);
+            return handleErrorInput(replyToken, '格式錯誤，請重新點選功能');
           }
         }
         //? 是否為更改名字輸入狀態
@@ -97,7 +97,7 @@ function handleText(message, replyToken, source, process) {
             return modifyController.handleModifyName(replyToken, text.split('b/').pop());
           } else {
             modifyController.resetNewOrder();
-            return handleErrorInput(replyToken);
+            return handleErrorInput(replyToken, '格式錯誤，請重新點選功能');
           }
         }
         //? 是否為更改項目輸入狀態
@@ -109,11 +109,11 @@ function handleText(message, replyToken, source, process) {
             return modifyController.confirmModify(replyToken);
           } else {
             modifyController.resetNewOrder();
-            return handleErrorInput(replyToken);
+            return handleErrorInput(replyToken, '格式錯誤，請重新點選功能');
           }
         } else {
           modifyController.resetNewOrder();
-          return handleErrorInput(replyToken);
+          return handleErrorInput(replyToken, '格式錯誤，請重新點選功能');
         }
       case 'CANCEL':
         //? 是否為名字輸入狀態
@@ -124,14 +124,14 @@ function handleText(message, replyToken, source, process) {
             return cancelController.handleName(replyToken, text.split('c/').pop());
           } else {
             cancelController.resetCancelOrder();
-            return handleErrorInput(replyToken);
+            return handleErrorInput(replyToken, '格式錯誤，請重新點選功能');
           }
         } else {
           cancelController.resetCancelOrder();
-          return handleErrorInput(replyToken);
+          return handleErrorInput(replyToken, '格式錯誤，請重新點選功能');
         }
       default:
-        return handleErrorInput(replyToken);
+        return handleErrorInput(replyToken, '格式錯誤，請重新點選功能');
     }
   } else {
     switch (text) {
@@ -168,13 +168,13 @@ function handleText(message, replyToken, source, process) {
 }
 
 /** 處理錯誤指令、格式*/
-function handleErrorInput(replyToken) {
-  PROCESS_MANAGER.resetProcess();
-  return client.replyMessage(replyToken, {
-    type: 'text',
-    text: '格式錯誤，請重新點選功能',
-  });
-}
+// function handleErrorInput(replyToken) {
+//   PROCESS_MANAGER.resetProcess();
+//   return client.replyMessage(replyToken, {
+//     type: 'text',
+//     text: '格式錯誤，請重新點選功能',
+//   });
+// }
 
 /** 處理錯誤指令、格式*/
 function handleErrorInput(replyToken, text) {
@@ -291,7 +291,7 @@ function handleSticker(message, replyToken) {
       stickerId: message.stickerId,
     });
   } else {
-    handleErrorInput(replyToken);
+    handleErrorInput(replyToken, '格式錯誤');
   }
 }
 
