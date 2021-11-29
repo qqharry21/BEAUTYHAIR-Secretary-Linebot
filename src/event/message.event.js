@@ -130,6 +130,8 @@ function handleText(message, replyToken, source, process) {
           cancelController.resetCancelOrder();
           return handleErrorInput(replyToken);
         }
+      default:
+        return handleErrorInput(replyToken);
     }
   } else {
     switch (text) {
@@ -156,6 +158,7 @@ function handleText(message, replyToken, source, process) {
       //* 其他無效指令
       default:
         console.log(`Echo message to ${replyToken}: ${text}`);
+        return handleErrorInput(replyToken, '無效指令');
         return client.replyMessage(replyToken, {
           type: 'text',
           text: '無效指令',
@@ -170,6 +173,15 @@ function handleErrorInput(replyToken) {
   return client.replyMessage(replyToken, {
     type: 'text',
     text: '格式錯誤，請重新點選功能',
+  });
+}
+
+/** 處理錯誤指令、格式*/
+function handleErrorInput(replyToken, text) {
+  PROCESS_MANAGER.resetProcess();
+  return client.replyMessage(replyToken, {
+    type: 'text',
+    text: text,
   });
 }
 
